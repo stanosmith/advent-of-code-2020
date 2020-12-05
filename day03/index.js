@@ -17,10 +17,10 @@ getInput()
     console.log(preppedInput)
     console.log('---')
 
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
-    // console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
+    console.log('---')
 
     // const solutionPartTwo = solvePartTwo(preppedInput)
     // console.log(`Part two puzzle answer ⭐️`)
@@ -37,11 +37,46 @@ async function getInput() {
 }
 
 function prepInput(input) {
-  return input
+  // Using the spread operator on a String 🎩
+  return input.map((entry) => [...entry])
 }
 
 function solvePuzzle(input) {
-  return 0
+  const over = 3
+  const tree = '#'
+  let totalTreeCollisions = 0
+
+  for (let i = 0; i < input.length; i++) {
+    // Calculate the next position to check
+    const nextOver = over * i
+    console.log('nextOver', nextOver)
+
+    // Use the repeater to create a map line with matches the width
+    const ogMapLine = input[i]
+    // TODO: Get the number repetitions we need to do in order to match the length
+    const numCopies = Math.ceil(nextOver / ogMapLine.length)
+    // console.log('numCopies', numCopies)
+    const ogMapLineExtended = extendMapLine(ogMapLine, numCopies)
+    console.log(ogMapLineExtended)
+
+    // Find the character at the nextOver index
+    if (ogMapLineExtended[nextOver] === tree) {
+      totalTreeCollisions++
+    }
+  }
+  return totalTreeCollisions
+}
+
+function extendMapLine(mapLine, numCopies, currentCopy = 0, newMapLine = []) {
+  console.table({ numCopies, currentCopy })
+
+  if (currentCopy !== numCopies) {
+    newMapLine = [...newMapLine, ...mapLine]
+    currentCopy++
+    return extendMapLine(mapLine, numCopies, currentCopy, newMapLine)
+  }
+
+  return newMapLine
 }
 
 function solvePartTwo(input) {
