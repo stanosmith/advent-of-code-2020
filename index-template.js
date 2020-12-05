@@ -9,7 +9,8 @@ getInput()
   .then((res) => {
     const input = res.split('\n').filter((item) => item !== '');
 
-    console.log(input);
+    solvePuzzle(input);
+
     console.log('Merry Christmas! 🎄');
   })
   .catch((err) => console.error(err));
@@ -17,4 +18,8 @@ getInput()
 async function getInput() {
   const input = await fs.readFile(inputPath);
   return input.toString();
+}
+
+function solvePuzzle(input) {
+  console.log(input);
 }
