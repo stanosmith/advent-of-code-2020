@@ -7,34 +7,20 @@ const inputPath = './test-input.txt'
 
 getInput()
   .then((res) => {
-    const input = res
-      .split('\n')
-      .filter((entry) => entry !== '')
-      .map((entry) => {
-        return entry
-          .split(' ')
-          .map((part) => {
-            if (part.includes('-')) {
-              return part
-                .split('-')
-                .map((iterationIndicator) => parseInt(iterationIndicator))
-            }
-            return part
-          })
-          .flat()
-          .map((part) => {
-            if (typeof part === 'string') {
-              return part.replace(':', '')
-            }
-            return part
-          })
-      })
+    const input = res.split('\n').filter((entry) => entry !== '')
+    console.log(`---\nOG input:`)
     console.log(input)
+    console.log('---')
 
-    const solution = solvePuzzle(input)
+    const preppedInput = prepInput(input)
+    console.log(`Prepped input:`)
+    console.log(preppedInput)
+    console.log('---')
+
+    const solution = solvePuzzle(preppedInput)
     console.log(`OG puzzle answer: ${solution} 🎅`)
 
-    // const solutionPartTwo = solvePartTwo(input)
+    // const solutionPartTwo = solvePartTwo(preppedInput)
     // console.log(`Part two puzzle answer: ${solutionPartTwo} 💯`)
 
     console.log('Merry Christmas! 🎄')
@@ -46,8 +32,51 @@ async function getInput() {
   return input.toString()
 }
 
+function prepInput(input) {
+  const policyModel = {
+    0: 'min',
+    1: 'max',
+    2: 'letter',
+    3: 'password',
+  }
+  return input.map((entry) => {
+    return (
+      entry
+        // Separate all of the different parts
+        .split(' ')
+        // Convert parse string numbers as integers
+        .map((part) => {
+          if (part.includes('-')) {
+            return part
+              .split('-')
+              .map((iterationIndicator) => parseInt(iterationIndicator))
+          }
+          return part
+        })
+        .flat()
+        // Remove colon from letter key
+        .map((part) => {
+          if (typeof part === 'string') {
+            return part.replace(':', '')
+          }
+          return part
+        })
+        // Convert to array object objects to help make the code easier to reason about
+        .reduce((accumulator, part, index) => {
+          let partNormalized =
+            typeof part === 'string' ? part.toLowerCase() : part
+          accumulator = {
+            ...accumulator,
+            [policyModel[index]]: partNormalized,
+          }
+          return accumulator
+        }, {})
+    )
+  })
+}
+
 function solvePuzzle(input) {
-  // Solution
+  // Loop through all passwords and their policy and validate each one
   return 0
 }
 
