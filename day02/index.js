@@ -2,8 +2,8 @@
 
 // https://adventofcode.com/2020/day/2
 const fs = require('fs').promises
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 getInput()
   .then((res) => {
@@ -18,8 +18,7 @@ getInput()
     console.log('---')
 
     const solution = solvePuzzle(preppedInput)
-    console.log(`OG puzzle answer 🎅`)
-    console.log(solution)
+    console.log(`OG puzzle answer: ${solution} 🎅`)
     console.log('---')
 
     // const solutionPartTwo = solvePartTwo(preppedInput)
