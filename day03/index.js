@@ -2,10 +2,10 @@
 
 const { getInput } = require('../helpers')
 
-// https://adventofcode.com/2020/day/2
+// https://adventofcode.com/2020/day/3
 
-const inputPath = './input.txt'
-// const inputPath = './test-input.txt'
+// const inputPath = './input.txt'
+const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -26,10 +26,10 @@ getInput(inputPath)
     console.log(solution)
     console.log('---')
 
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer ⭐️`)
-    // console.log(solutionPartTwo)
-    // console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log(`Part two puzzle answer ⭐️`)
+    console.log(solutionPartTwo)
+    console.log('---')
 
     console.log('Merry Christmas! 🎄')
   })
@@ -42,16 +42,19 @@ function prepInput(input) {
 }
 
 function solvePuzzle(input) {
+  return getTreeCollisionsForSlope(input, { right: 3, down: 1 })
+}
+
+function getTreeCollisionsForSlope(input, { right, down }) {
   const lineLength = input[0].length
-  const over = 3
-  const tree = '#'
   let totalTreeCollisions = 0
+  const tree = '#'
 
   for (let i = 0; i < input.length; i++) {
     const ogMapLine = input[i]
 
     // Calculate the next position to check
-    const nextOver = (over * i) % lineLength
+    const nextOver = (right * i) % lineLength
     const hit = ogMapLine[nextOver] === tree
     console.log({
       nextOver,
@@ -64,10 +67,16 @@ function solvePuzzle(input) {
     }
   }
 
-  // INFO: `264` is NOT the answer
   return totalTreeCollisions
 }
 
 function solvePartTwo(input) {
-  return 0
+  const slopes = [
+    { right: 1, down: 1 },
+    { right: 3, down: 1 },
+    { right: 5, down: 1 },
+    { right: 7, down: 1 },
+    { right: 7, down: 2 },
+  ]
+  return slopes.map(getTreeCollisionsForSlope.bind(null, input))
 }
