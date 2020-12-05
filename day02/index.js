@@ -18,7 +18,9 @@ getInput()
     console.log('---')
 
     const solution = solvePuzzle(preppedInput)
-    console.log(`OG puzzle answer: ${solution} 🎅`)
+    console.log(`OG puzzle answer 🎅`)
+    console.log(solution)
+    console.log('---')
 
     // const solutionPartTwo = solvePartTwo(preppedInput)
     // console.log(`Part two puzzle answer: ${solutionPartTwo} 💯`)
@@ -36,7 +38,7 @@ function prepInput(input) {
   const policyModel = {
     0: 'min',
     1: 'max',
-    2: 'letter',
+    2: 'character',
     3: 'password',
   }
   return input.map((entry) => {
@@ -54,7 +56,7 @@ function prepInput(input) {
           return part
         })
         .flat()
-        // Remove colon from letter key
+        // Remove colon from character value
         .map((part) => {
           if (typeof part === 'string') {
             return part.replace(':', '')
@@ -77,7 +79,21 @@ function prepInput(input) {
 
 function solvePuzzle(input) {
   // Loop through all passwords and their policy and validate each one
-  return 0
+  return input
+    .map((entry) => {
+      const characterCount = entry.password.split(entry.character).length - 1
+      return {
+        ...entry,
+        characterCount,
+        isValid: characterCount >= entry.min && characterCount <= entry.max,
+      }
+    })
+    .reduce((accumulator, entry) => {
+      if (entry.isValid) {
+        accumulator++
+      }
+      return accumulator
+    }, 0)
 }
 
 function solvePartTwo(input) {
