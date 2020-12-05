@@ -18,11 +18,14 @@ getInput()
     console.log('---')
 
     const solution = solvePuzzle(preppedInput)
-    console.log(`OG puzzle answer: ${solution} 🎅`)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
     console.log('---')
 
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer: ${solutionPartTwo} 💯`)
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log(`Part two puzzle answer ⭐️`)
+    console.log(solutionPartTwo)
+    console.log('---')
 
     console.log('Merry Christmas! 🎄')
   })
@@ -96,5 +99,27 @@ function solvePuzzle(input) {
 }
 
 function solvePartTwo(input) {
-  return 0
+  return input
+    .map((entry) => {
+      const charPos1 = entry.password.charAt(entry.min - 1)
+      const charPos2 = entry.password.charAt(entry.max - 1)
+      const charPos1Match = charPos1 === entry.character
+      const charPos2Match = charPos2 === entry.character
+      return {
+        ...entry,
+        // charPos1,
+        // charPos1Match,
+        // charPos2,
+        // charPos2Match,
+        isValid:
+          (charPos1Match && !charPos2Match) ||
+          (!charPos1Match && charPos2Match),
+      }
+    })
+    .reduce((accumulator, entry) => {
+      if (entry.isValid) {
+        accumulator++
+      }
+      return accumulator
+    }, 0)
 }
