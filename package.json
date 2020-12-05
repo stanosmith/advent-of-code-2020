@@ -1,0 +1,30 @@
+{
+  "name": "advent-of-code-2020",
+  "version": "1.0.0",
+  "description": "https://adventofcode.com/2020",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/stanosmith/advent-of-code-2020.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/stanosmith/advent-of-code-2020/issues"
+  },
+  "homepage": "https://gitlab.com/stanosmith/advent-of-code-2020#readme",
+  "devDependencies": {
+    "husky": "^4.3.0",
+    "prettier": "^2.2.1",
+    "pretty-quick": "^3.1.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  }
+}
