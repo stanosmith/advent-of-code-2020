@@ -7,9 +7,17 @@ const inputPath = './input.txt'
 
 getInput()
   .then((res) => {
-    const input = res.split('\n').filter((item) => item !== '')
+    const input = res
+      .split('\n')
+      .filter((item) => item !== '')
+      .map((entry) => parseInt(entry))
+    console.log(input)
 
-    solvePuzzle(input)
+    const solution = solvePuzzle(input)
+    console.log(`OG puzzle answer: ${solution} 🎅`)
+
+    const solutionPartTwo = solvePartTwo(input)
+    console.log(`Part two puzzle answer: ${solutionPartTwo} 💯`)
 
     console.log('Merry Christmas! 🎄')
   })
@@ -21,9 +29,7 @@ async function getInput() {
 }
 
 function solvePuzzle(input) {
-  console.log(input)
   const sumCombos = input
-    .map((entry) => parseInt(entry))
     .map((a, indexA, entriesA) => {
       return entriesA.map((b, indexB) => {
         if (indexA > indexB) {
@@ -37,11 +43,38 @@ function solvePuzzle(input) {
     })
     .flat()
     .filter((sum) => typeof sum !== 'undefined')
-  // .filter((sum) => sum === 2020)
-  console.log(sumCombos, sumCombos.length)
+  // console.log(sumCombos, sumCombos.length)
 
-  const solution = sumCombos
+  // Solution
+  return sumCombos
     .filter((combo) => combo.sum === 2020)
     .reduce((accumulator, combo) => combo.a * combo.b, undefined)
-  console.log(solution)
+}
+
+function solvePartTwo(input) {
+  const sumCombos = input
+    .map((a, indexA, entriesA) => {
+      return entriesA
+        .map((b, indexB, entriesB) => {
+          return entriesB.map((c, indexC) => {
+            if (indexA > indexB && indexB > indexC) {
+              return {
+                a,
+                b,
+                c,
+                sum: a + b + c,
+              }
+            }
+          })
+        })
+        .flat()
+    })
+    .flat()
+    .filter((combo) => typeof combo !== 'undefined')
+  // console.log(sumCombos, sumCombos.length)
+
+  // Solution
+  return sumCombos
+    .filter((combo) => combo.sum === 2020)
+    .reduce((accumulator, combo) => combo.a * combo.b * combo.c, undefined)
 }
