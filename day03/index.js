@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/3
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -45,22 +45,48 @@ function solvePuzzle(input) {
   return getTreeCollisionsForSlope(input, { right: 3, down: 1 })
 }
 
-function getTreeCollisionsForSlope(input, { right, down }) {
+function getTreeCollisionsForSlope(input, { right, down, log }) {
   const lineLength = input[0].length
   let totalTreeCollisions = 0
   const tree = '#'
 
   for (let i = 0; i < input.length; i++) {
+    // Skip rows based on the down number
+    if (i % down > 0) {
+      continue
+    }
+
     const ogMapLine = input[i]
 
     // Calculate the next position to check
-    const nextOver = (right * i) % lineLength
+    let nextOver = Math.floor(((right / down) * i) % lineLength)
+
+    // Calculate the offset of the next right based on the down
+    const nextOverOffset = i % down
+
+    // if (down > 1) {
+    //   nextOver = Math.abs(nextOver - nextOverOffset)
+    // }
+
+    // Set hit or miss values
     const hit = ogMapLine[nextOver] === tree
-    console.log({
+    const hitOrMiss = hit ? 'X' : 'O'
+    const xoMapLine = `${ogMapLine.slice(
+      0,
       nextOver,
-      // character: ogMapLine[nextOver],
-      hitOrMiss: hit ? 'X' : 'O',
-    })
+    )}${hitOrMiss}${ogMapLine.slice(nextOver + 1)}`
+
+    if (log) {
+      console.log({
+        i,
+        nextOver,
+        nextOverOffset,
+        ogMapLine,
+        xoMapLine,
+        // character: ogMapLine[nextOver],
+        // hitOrMiss: hit ? 'X' : 'O',
+      })
+    }
 
     if (hit) {
       totalTreeCollisions++
@@ -72,11 +98,23 @@ function getTreeCollisionsForSlope(input, { right, down }) {
 
 function solvePartTwo(input) {
   const slopes = [
-    { right: 1, down: 1 },
-    { right: 3, down: 1 },
-    { right: 5, down: 1 },
-    { right: 7, down: 1 },
-    { right: 7, down: 2 },
+    { right: 1, down: 1, log: false },
+    { right: 3, down: 1, log: false },
+    { right: 5, down: 1, log: false },
+    { right: 7, down: 1, log: false },
+    { right: 1, down: 2, log: false },
   ]
-  return slopes.map(getTreeCollisionsForSlope.bind(null, input))
+
+  // Too HIGH: 9468333600
+
+  return slopes
+    .map(getTreeCollisionsForSlope.bind(null, input))
+    .map((totalTreeHits) => {
+      console.log(totalTreeHits)
+      return totalTreeHits
+    })
+    .reduce(
+      (productOfAllSlopes, totalTreeHits) => totalTreeHits * productOfAllSlopes,
+      1,
+    )
 }
