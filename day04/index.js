@@ -89,6 +89,23 @@ function prepInput(input) {
 }
 
 function solvePuzzle(input) {
+  const validPassports = getValidPassports(input)
+
+  // `201` is too high, but `200` is not… Off by one, that's crazy!
+  return validPassports.length
+}
+
+function solvePartTwo(input) {
+  const validatedPassports = getValidPassports(input).map((entry) => {
+    return passportFields
+      .filter((fieldMeta) => entry.hasOwnProperty(fieldMeta.name))
+      .map((fieldMeta) => fieldMeta.validator(entry[fieldMeta.name]))
+  })
+
+  return validatedPassports.length
+}
+
+function getValidPassports(input) {
   const requiredFields = passportFields
     .filter((field) => !field.ignore)
     .map((field) => field.name)
@@ -99,15 +116,16 @@ function solvePuzzle(input) {
   console.log('requiredFields', requiredFields)
   console.log('ignoredFields', ignoredFields)
 
-  const validPassports = input
-    // Check the total number of required fields against the number of fields on each passport
-    .map((entry) => {
-      const entryFields = Object.keys(entry)
-      const missingRequiredFields = passportFields
-        .map((field) => field.name)
-        .filter((fieldName) => !entryFields.includes(fieldName))
-        .filter((fieldName) => !ignoredFields.includes(fieldName))
-      console.log('missingRequiredFields', missingRequiredFields)
+  return (
+    input
+      // Check the total number of required fields against the number of fields on each passport
+      .map((entry) => {
+        const entryFields = Object.keys(entry)
+        const missingRequiredFields = passportFields
+          .map((field) => field.name)
+          .filter((fieldName) => !entryFields.includes(fieldName))
+          .filter((fieldName) => !ignoredFields.includes(fieldName))
+        console.log('missingRequiredFields', missingRequiredFields)
 
       if (missingRequiredFields.length === 0) {
         return {
@@ -116,9 +134,11 @@ function solvePuzzle(input) {
         }
       }
 
-      return entry
-    })
-    .filter((entry) => entry.valid)
+        return entry
+      })
+      .filter((entry) => entry.valid)
+  )
+}
 
   // `201` is too high, but `200` is not… Off by one, that's crazy!
   return validPassports.length
