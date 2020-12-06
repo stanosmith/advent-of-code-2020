@@ -7,9 +7,20 @@ const { getInput } = require('../helpers')
 // const inputPath = './input.txt'
 const inputPath = './test-input.txt'
 
+const requiredFields = [
+  'byr', // (Birth Year)
+  'cid', // (Country ID)
+  'ecl', // (Eye Color)
+  'eyr', // (Expiration Year)
+  'hcl', // (Hair Color)
+  'hgt', // (Height)
+  'iyr', // (Issue Year)
+  'pid', // (Passport ID)
+]
+
 getInput(inputPath)
   .then((res) => {
-    const input = res.split('\n').filter((entry) => entry !== '')
+    const input = res.split('\n\n').filter((entry) => entry !== '')
     console.log(`---\nOG input:`)
     console.log('input.length', input.length)
     // console.log(input)
@@ -38,6 +49,19 @@ getInput(inputPath)
 
 function prepInput(input) {
   return input
+    .map((entry) => {
+      return entry.split('\n').join(' ').split(' ')
+    })
+    .map((entry) => {
+      return entry.sort().reduce((accumulator, keyValueData) => {
+        const keyValue = keyValueData.split(':')
+        accumulator = {
+          ...accumulator,
+          [keyValue[0]]: keyValue[1],
+        }
+        return accumulator
+      }, {})
+    })
 }
 
 function solvePuzzle(input) {
