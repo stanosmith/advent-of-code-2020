@@ -7,15 +7,39 @@ const { getInput } = require('../helpers')
 // const inputPath = './input.txt'
 const inputPath = './test-input.txt'
 
-const requiredFields = [
-  'byr', // (Birth Year)
-  'cid', // (Country ID)
-  'ecl', // (Eye Color)
-  'eyr', // (Expiration Year)
-  'hcl', // (Hair Color)
-  'hgt', // (Height)
-  'iyr', // (Issue Year)
-  'pid', // (Passport ID)
+const passportFields = [
+  {
+    name: 'byr', // (Birth Year)
+    ignore: false,
+  },
+  {
+    name: 'cid', // (Country ID)
+    ignore: true,
+  },
+  {
+    name: 'ecl', // (Eye Color)
+    ignore: false,
+  },
+  {
+    name: 'eyr', // (Expiration Year)
+    ignore: false,
+  },
+  {
+    name: 'hcl', // (Hair Color)
+    ignore: false,
+  },
+  {
+    name: 'hgt', // (Height)
+    ignore: false,
+  },
+  {
+    name: 'iyr', // (Issue Year)
+    ignore: false,
+  },
+  {
+    name: 'pid', // (Passport ID)
+    ignore: false,
+  },
 ]
 
 getInput(inputPath)
@@ -31,11 +55,11 @@ getInput(inputPath)
     console.log(preppedInput)
     console.log('---')
 
-    // const solution = solvePuzzle(preppedInput)
-    // console.log('---')
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
-    // console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log('---')
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
+    console.log('---')
 
     // const solutionPartTwo = solvePartTwo(preppedInput)
     // console.log('---')
@@ -65,7 +89,39 @@ function prepInput(input) {
 }
 
 function solvePuzzle(input) {
-  return 0
+  const requiredFields = passportFields
+    .filter((field) => !field.ignore)
+    .map((field) => field.name)
+  const ignoredFields = passportFields
+    .filter((field) => field.ignore)
+    .map((field) => field.name)
+
+  console.log('requiredFields', requiredFields)
+  console.log('ignoredFields', ignoredFields)
+
+  const validPassports = input
+    // Remove ignored fields from each entry
+    .map((entry) => {
+      const entryCopy = Object.assign({}, entry)
+      for (let i = 0; i < ignoredFields.length; i++) {
+        delete entryCopy[ignoredFields[i]]
+      }
+      return entryCopy
+    })
+    // Check the total number of required fields against the number of fields on each passport
+    .map((entry) => {
+      const entryKeys = Object.keys(entry)
+      if (entryKeys.length === requiredFields.length) {
+        return {
+          ...entry,
+          valid: true,
+        }
+      }
+      return entry
+    })
+    .filter((entry) => entry.valid)
+
+  return validPassports.length
 }
 
 function solvePartTwo(input) {
