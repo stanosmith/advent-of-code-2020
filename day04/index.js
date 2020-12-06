@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/4
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 const passportFields = [
   {
@@ -100,27 +100,27 @@ function solvePuzzle(input) {
   console.log('ignoredFields', ignoredFields)
 
   const validPassports = input
-    // Remove ignored fields from each entry
-    .map((entry) => {
-      const entryCopy = Object.assign({}, entry)
-      for (let i = 0; i < ignoredFields.length; i++) {
-        delete entryCopy[ignoredFields[i]]
-      }
-      return entryCopy
-    })
     // Check the total number of required fields against the number of fields on each passport
     .map((entry) => {
-      const entryKeys = Object.keys(entry)
-      if (entryKeys.length === requiredFields.length) {
+      const entryFields = Object.keys(entry)
+      const missingRequiredFields = passportFields
+        .map((field) => field.name)
+        .filter((fieldName) => !entryFields.includes(fieldName))
+        .filter((fieldName) => !ignoredFields.includes(fieldName))
+      console.log('missingRequiredFields', missingRequiredFields)
+
+      if (missingRequiredFields.length === 0) {
         return {
           ...entry,
           valid: true,
         }
       }
+
       return entry
     })
     .filter((entry) => entry.valid)
 
+  // `201` is too high, but `200` is not… Off by one, that's crazy!
   return validPassports.length
 }
 
