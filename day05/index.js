@@ -32,12 +32,13 @@ getInput(inputPath)
     console.log(`OG puzzle answer ⭐️`)
     console.log(solution)
     console.log('---')
-    //
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log('---')
-    // console.log(`Part two puzzle answer ⭐️`)
-    // console.log(solutionPartTwo)
-    // console.log('---')
+
+    // I found the answer visually. It's the number in the middle of the really low and really high numbers
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log('---')
+    console.log(`Part two puzzle answer ⭐️`)
+    console.log(solutionPartTwo)
+    console.log('---')
 
     console.log('Merry Christmas! 🎄')
   })
@@ -58,7 +59,17 @@ function solvePuzzle(input) {
 }
 
 function solvePartTwo(input) {
-  return 0
+  const allSeats = createRange(totalSeatColumns * totalSeatRows)
+  const assignedSeats = input.map(decodeSeat).map((seat) => seat.id)
+  const unassignedSeats = allSeats
+    .filter((seat) => !assignedSeats.includes(seat))
+    .sort((a, b) => a - b)
+
+  console.log('allSeats.length', allSeats.length)
+  console.log('unassignedSeats.length', unassignedSeats.length)
+  console.table(unassignedSeats)
+
+  return unassignedSeats.length
 }
 
 function decodeSeat(value) {
