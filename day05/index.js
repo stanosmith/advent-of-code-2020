@@ -52,7 +52,9 @@ function solvePuzzle(input) {
   // BFFFBBFRRR: row 70, column 7, seat ID 567.
   // FFFBBBFRRR: row 14, column 7, seat ID 119.
   // BBFFBBFRLL: row 102, column 4, seat ID 820.
-  return input.map(decodeSeat)
+  const seatsSortedById = input.map(decodeSeat).sort((a, b) => b.id - a.id)
+  console.table(seatsSortedById)
+  return seatsSortedById[0].id
 }
 
 function solvePartTwo(input) {
