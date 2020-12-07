@@ -2,7 +2,7 @@
 
 const { getInput } = require('../helpers')
 
-// https://adventofcode.com/2020/day/4
+// https://adventofcode.com/2020/day/5
 
 // const inputPath = './input.txt'
 const inputPath = './test-input.txt'
@@ -66,9 +66,9 @@ function decodeSeat(value) {
 
   // INFO: decoding `FBFBBFFRLR` reveals that it is the seat at row `44`, column `5`, ID `357`
   return {
-    id,
     row,
     col,
+    id,
   }
 }
 
@@ -82,8 +82,7 @@ function decodeRow(value) {
   // - B keeps rows 44 through 47.
   // - F keeps rows 44 through 45.
   // - The final F keeps the lower of the two, row 44.
-  value = 'FBFBBFF' // TODO: Comment after testing
-
+  // value = 'FBFBBFF' // TODO: Comment after testing
   return [...value.toUpperCase()]
     .reduce(getSeat, createRange(totalSeatRows))
     .reduce((col, value) => value, 0)
@@ -95,7 +94,7 @@ function decodeCol(value) {
   // - R means to take the upper half, keeping columns 4 through 7.
   // - L means to take the lower half, keeping columns 4 through 5.
   // - The final R keeps the upper of the two, column 5.
-  value = 'RLR' // TODO: Comment after testing
+  // value = 'RLR' // TODO: Comment after testing
   return [...value.toUpperCase()]
     .reduce(getSeat, createRange(totalSeatColumns))
     .reduce((col, value) => value, 0)
