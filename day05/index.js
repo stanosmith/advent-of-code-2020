@@ -9,8 +9,10 @@ const inputPath = './test-input.txt'
 
 const totalSeatRows = 128 // numbered 0 through 127
 const totalSeatColumns = 8 // numbered 0 through 7
-const upper = 'B'
-const lower = 'F'
+const upperRow = 'B'
+const lowerRow = 'F'
+const upperCol = 'R'
+const lowerCol = 'L'
 
 getInput(inputPath)
   .then((res) => {
@@ -59,7 +61,7 @@ function solvePartTwo(input) {
 
 function decodeSeat(value) {
   const row = decodeRow(value.slice(0, 7))
-  const col = decodeCol(value.substr(7))
+  const col = decodeCol(value.slice(7))
   const id = getSeatId(row, col)
 
   // INFO: decoding `FBFBBFFRLR` reveals that it is the seat at row `44`, column `5`, ID `357`
@@ -82,22 +84,26 @@ function decodeRow(value) {
   // - The final F keeps the lower of the two, row 44.
   value = 'FBFBBFF' // TODO: Comment after testing
 
-  return [...value.toUpperCase()].reduce(getSeat, createRange(totalSeatRows))
+  return [...value.toUpperCase()]
+    .reduce(getSeat, createRange(totalSeatRows))
+    .reduce((col, value) => value, 0)
 }
 
 function decodeCol(value) {
   // INFO: For example, consider just the last 3 characters of `FBFBBFFRLR` (RLR):
-  value = 'RLR'
   // - Start by considering the whole range, columns 0 through 7.
   // - R means to take the upper half, keeping columns 4 through 7.
   // - L means to take the lower half, keeping columns 4 through 5.
   // - The final R keeps the upper of the two, column 5.
-  return 0
+  value = 'RLR' // TODO: Comment after testing
+  return [...value.toUpperCase()]
+    .reduce(getSeat, createRange(totalSeatColumns))
+    .reduce((col, value) => value, 0)
 }
 
 function getSeat(seat, upperOrLower) {
   const halfIndex = seat.length / 2
-  if (upperOrLower === upper) {
+  if (upperOrLower === upperRow || upperOrLower === upperCol) {
     return seat.slice(halfIndex)
   }
   return seat.slice(0, halfIndex)
