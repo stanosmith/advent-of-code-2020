@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/5
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 const totalSeatRows = 128 // numbered 0 through 127
 const totalSeatColumns = 8 // numbered 0 through 7
