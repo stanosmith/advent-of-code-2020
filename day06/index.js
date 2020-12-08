@@ -1,5 +1,7 @@
 'use strict'
 
+const { intersection } = require('lodash')
+
 const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/5
@@ -25,11 +27,11 @@ getInput(inputPath)
     console.log(solution)
     console.log('---')
 
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log('---')
-    // console.log(`Part two puzzle answer ⭐️`)
-    // console.log(solutionPartTwo)
-    // console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log('---')
+    console.log(`Part two puzzle answer ⭐️`)
+    console.log(solutionPartTwo)
+    console.log('---')
 
     console.log('Merry Christmas! 🎄')
   })
@@ -53,5 +55,16 @@ function solvePuzzle(input) {
 }
 
 function solvePartTwo(input) {
-  return 0
+  // You don't need to identify the questions to which _anyone_ answered "yes";
+  // you need to identify the questions to which _everyone_ answered "yes"!
+  return input
+    .map((group) => {
+      return group.map((answers) => [...answers])
+    })
+    .map((group) => intersection(...group))
+    .map((group) => {
+      console.log(group)
+      return group
+    })
+    .reduce((sumOfCounts, answers) => sumOfCounts + answers.length, 0)
 }
