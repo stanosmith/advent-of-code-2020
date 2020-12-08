@@ -4,7 +4,7 @@ const { intersection } = require('lodash')
 
 const { getInput } = require('../helpers')
 
-// https://adventofcode.com/2020/day/5
+// https://adventofcode.com/2020/day/6
 
 const inputPath = './input.txt'
 // const inputPath = './test-input.txt'
