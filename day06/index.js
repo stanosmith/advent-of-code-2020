@@ -4,28 +4,27 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/5
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
-    const input = res.split('\n').filter((entry) => entry !== '')
+    const input = res.split('\n\n')
     console.log(`---\nOG input:`)
     console.log('input.length', input.length)
     // console.log(input)
-    console.log('---')
 
     const preppedInput = prepInput(input)
-    console.log(`Prepped input:`)
-    console.log(preppedInput)
+    console.log(`---\nPrepped input:`)
+    console.log(preppedInput.length)
+    // console.log(preppedInput)
+
+    const solution = solvePuzzle(preppedInput)
+    console.log('---')
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
     console.log('---')
 
-    // const solution = solvePuzzle(preppedInput)
-    // console.log('---')
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
-    // console.log('---')
-    //
     // const solutionPartTwo = solvePartTwo(preppedInput)
     // console.log('---')
     // console.log(`Part two puzzle answer ⭐️`)
@@ -37,11 +36,20 @@ getInput(inputPath)
   .catch((err) => console.error(err))
 
 function prepInput(input) {
-  return input
+  return input.map((entry) => entry.split('\n'))
 }
 
 function solvePuzzle(input) {
-  return 0
+  // Duplicate answers to the same question don't count extra; each question counts at most once
+  return input
+    .map((group) => {
+      return [...new Set(group.map((answers) => [...answers]).flat())]
+    })
+    .map((group) => {
+      console.log(group)
+      return group
+    })
+    .reduce((sumOfCounts, answers) => sumOfCounts + answers.length, 0)
 }
 
 function solvePartTwo(input) {
