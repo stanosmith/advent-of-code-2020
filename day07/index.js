@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/7
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 const myBag = 'shiny gold'
 
@@ -105,12 +105,12 @@ function solvePuzzle(input) {
   const outerBagsThatHoldMyBag = input.filter((bag) => {
     return bag.contains.filter((innerBag) => innerBag.color === myBag).length
   })
-  console.table(
-    outerBagsThatHoldMyBag.map((bag) => ({
-      ...bag,
-      contains: bag.contains.map((innerBag) => innerBag.color),
-    })),
-  )
+  // console.table(
+  //   outerBagsThatHoldMyBag.map((bag) => ({
+  //     ...bag,
+  //     contains: JSON.stringify(bag.contains.map((innerBag) => innerBag.color)),
+  //   })),
+  // )
 
   const innerBagsThatHoldTheOuterBagsThatHoldMyBag = input
     // Exclude the bags that hold my bag directly
@@ -124,26 +124,45 @@ function solvePuzzle(input) {
     // Look for inner bags which hold the outer bags (which hold my bag)
     .filter((bag) => {
       return bag.contains.filter((innerBag) => {
-        debugger
         return outerBagsThatHoldMyBag.filter((outerBag) => {
-          debugger
           return outerBag.color === innerBag.color
         }).length
       }).length
     })
+  // console.table(
+  //   innerBagsThatHoldTheOuterBagsThatHoldMyBag.map((bag) => ({
+  //     ...bag,
+  //     contains: JSON.stringify(bag.contains.map((innerBag) => innerBag.color)),
+  //   })),
+  // )
+
+  const combinedBags = [
+    ...outerBagsThatHoldMyBag,
+    ...innerBagsThatHoldTheOuterBagsThatHoldMyBag,
+  ].sort((a, b) => {
+    const nameA = a.color.toUpperCase() // ignore upper and lowercase
+    const nameB = b.color.toUpperCase() // ignore upper and lowercase
+    if (nameA < nameB) {
+      return -1
+    }
+    if (nameA > nameB) {
+      return 1
+    }
+
+    // names must be equal
+    return 0
+  })
   console.table(
-    innerBagsThatHoldTheOuterBagsThatHoldMyBag.map((bag) => ({
+    combinedBags.map((bag) => ({
       ...bag,
-      contains: bag.contains.map((innerBag) => innerBag.color),
+      // contains: JSON.stringify(bag.contains.map((innerBag) => innerBag.color)),
+      contains: JSON.stringify(bag.contains),
     })),
   )
 
   // Test input answer is `4`
   // INFO: `39` is not the correct answer
-  return [
-    ...outerBagsThatHoldMyBag,
-    ...innerBagsThatHoldTheOuterBagsThatHoldMyBag,
-  ].length
+  return combinedBags.length
 }
 
 function solvePartTwo(input) {
