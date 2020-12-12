@@ -1,15 +1,15 @@
 'use strict'
 
-const { differenceBy, intersection } = require('lodash')
+const { differenceBy, intersection, intersectionBy } = require('lodash')
 const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/7
 
-const inputPath = './input.txt'
+// const inputPath = './input.txt'
 // const inputPath = './test-input.txt'
-// const inputPath = './test-input-part-2.txt'
+const inputPath = './test-input-part-2.txt'
 
-const myBag = 'shiny gold'
+const myBagColor = 'shiny gold'
 
 getInput(inputPath)
   .then((res) => {
@@ -34,12 +34,154 @@ getInput(inputPath)
     console.log('---')
     const solutionPartTwo = solvePartTwo(preppedInput)
     console.log(`Part two puzzle answer ⭐️⭐️`)
-    // console.log(solutionPartTwo)
+    console.log(solutionPartTwo)
 
     console.log('---')
     console.log('Merry Christmas! 🎄')
   })
   .catch((err) => console.error(err))
+
+function isMyBag(bag) {
+  return bag.color === myBagColor
+}
+
+function isNotMyBag(bag) {
+  return bag.color !== myBagColor
+}
+
+function solvePuzzle(input) {
+  // Adjust the initial input data
+  input = input
+    // Remove bags which don't hold other bags
+    .filter((bag) => bag.innerBags.length)
+    // Remove my bag, since it can't hold itself
+    .filter(isNotMyBag)
+
+  // Find the initial bags which contain my bag
+  const bagsContainingMyBag = input.filter((bag) => {
+    return bag.innerBags.filter(isMyBag).length > 0
+  })
+
+  const allBagsWhichHoldMyBag = getBags(input, bagsContainingMyBag)
+
+  // Test input answer is `4`
+  // INFO: `39` is not the correct answer
+  const solution = [
+    ...new Set(allBagsWhichHoldMyBag.map((bag) => bag.color).sort()),
+  ]
+
+  console.log(solution)
+
+  return solution.length
+}
+
+function solvePartTwo(input) {
+  const allBagsInsideMyBag = addBags(
+    input,
+    input.filter(isMyBag).map((bag) => ({ ...bag, count: 0 })),
+  )
+
+  logBags(input)
+  // logBags(allBagsInsideMyBag)
+
+  // Test part-2 input total = 126
+  return allBagsInsideMyBag
+}
+
+function logBags(bags) {
+  try {
+    console.log(
+      'bags',
+      bags.map((bag) => ({
+        color: bag.color,
+        innerBags: bag.innerBags.map((innerBag) => JSON.stringify(innerBag)),
+      })),
+    )
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+function addBags(input, bagsToAdd, subtotal = 0) {
+  const bagsToSearch = intersectionBy(input, bagsToAdd, 'color')
+
+  // subtotal = bagCount + (bagCount * innerBagsTotal)
+  debugger
+
+  const newBags = bagsToSearch.map((bag) => bag.innerBags)
+
+  subtotal++
+
+  // if (newBags.length) {
+  //   return addBags(input, newBags, subtotal)
+  // }
+
+  // Each loop should
+
+  // What if, in every loop, the inner bags and their counts were found and added up
+  // and the only thing returned was the subtotal?
+
+  const exampleOutput = [
+    {
+      color: 'shiny gold',
+      innerBags: [
+        {
+          color: 'dark red',
+          count: 2,
+          innerBags: [
+            {
+              color: 'dark orange',
+              count: 2,
+              innerBags: [
+                {
+                  color: 'dark yellow',
+                  count: 2,
+                  innerBags: [
+                    {
+                      color: 'dark green',
+                      count: 2,
+                      innerBags: [
+                        {
+                          color: 'dark blue',
+                          count: 2,
+                          innerBags: [
+                            { color: 'dark violet', count: 2, innerBags: [] },
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ]
+
+  return subtotal
+}
+
+function getBags(input, bagsToSearchFor, allBags = []) {
+  const bagColorsToFind = bagsToSearchFor.map((bag) => bag.color)
+  const bagsToSearch = differenceBy(input, bagsToSearchFor, 'color')
+  const matchingBags = bagsToSearch.filter((bag) => {
+    const innerBagColors = bag.innerBags.map((innerBag) => innerBag.color)
+    return intersection(bagColorsToFind, innerBagColors).length > 0
+  })
+
+  // Update the collection of bags
+  allBags = [...allBags, ...bagsToSearchFor]
+
+  if (matchingBags.length) {
+    // Recursive-ness yo!
+    return getBags(input, matchingBags, allBags)
+  }
+
+  // Pass collected bags back
+  return allBags
+}
 
 function prepInput(input) {
   return input.map((entry) => {
@@ -92,59 +234,4 @@ function prepInput(input) {
       //
     )
   })
-}
-
-function isMyBag(bag) {
-  return bag.color === myBag
-}
-
-function solvePuzzle(input) {
-  // Adjust the initial input data
-  input = input
-    // Remove bags which don't hold other bags
-    .filter((bag) => bag.innerBags.length)
-    // Remove my bag, since it can't hold itself
-    .filter((bag) => bag.color !== myBag)
-
-  // Find the initial bags which contain my bag
-  const bagsContainingMyBag = input.filter((bag) => {
-    return bag.innerBags.filter(isMyBag).length > 0
-  })
-
-  const allBagsWhichHoldMyBag = getBags(input, bagsContainingMyBag)
-
-  // Test input answer is `4`
-  // INFO: `39` is not the correct answer
-  const solution = [
-    ...new Set(allBagsWhichHoldMyBag.map((bag) => bag.color).sort()),
-  ]
-
-  console.log(solution)
-
-  return solution.length
-}
-
-function solvePartTwo(input) {
-  // Test part-2 input total = 126
-  return input
-}
-
-function getBags(input, bagsToSearchFor, allBags = []) {
-  const bagColorsToFind = bagsToSearchFor.map((bag) => bag.color)
-  const bagsToSearch = differenceBy(input, bagsToSearchFor, 'color')
-  const matchingBags = bagsToSearch.filter((bag) => {
-    const innerBagColors = bag.innerBags.map((innerBag) => innerBag.color)
-    return intersection(bagColorsToFind, innerBagColors).length > 0
-  })
-
-  // Update the collection of bags
-  allBags = [...allBags, ...bagsToSearchFor]
-
-  if (matchingBags.length) {
-    // Recursive-ness yo!
-    return getBags(input, matchingBags, allBags)
-  }
-
-  // Pass collected bags back
-  return allBags
 }
