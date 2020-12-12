@@ -1,5 +1,6 @@
 'use strict'
 
+const { differenceBy, intersection } = require('lodash')
 const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/7
@@ -27,6 +28,7 @@ getInput(inputPath)
     const solution = solvePuzzle(preppedInput)
     console.log(`OG puzzle answer ⭐️`)
     console.log(solution)
+    // console.log(JSON.stringify(solution, null, 2))
     console.log('---')
 
     // console.log('---')
@@ -51,11 +53,11 @@ function prepInput(input) {
               if (index === 0) {
                 return {
                   color: subEntry,
-                  contains: [], // Need to add empty array cause in some cases a bag doesn't contain anything
+                  innerBags: [], // Need to add empty array cause in some cases a bag doesn't contain anything
                 }
               }
               return {
-                contains: subEntry
+                innerBags: subEntry
                   .split(', ')
                   // Empty arrays for all bags which don't hold other bags
                   .filter(
@@ -71,7 +73,7 @@ function prepInput(input) {
 
                     return {
                       color,
-                      count,
+                      // count,
                     }
                   }),
               }
@@ -95,74 +97,81 @@ function prepInput(input) {
         )
       })
       // Remove bags which don't hold other bags
-      .filter((bag) => bag.contains.length)
+      .filter((bag) => bag.innerBags.length)
       // Remove my bag, since it can't hold itself
       .filter((bag) => bag.color !== myBag)
   )
 }
 
+function getBags(input, bagsToSearchFor) {
+  if (bagsToSearchFor) {
+    const bagColorsToFind = bagsToSearchFor.map((bag) => bag.color)
+    const bagsToSearch = differenceBy(input, bagsToSearchFor, 'color')
+    return bagsToSearch.filter((bag) => {
+      const innerBagColors = bag.innerBags.map((innerBag) => innerBag.color)
+      return intersection(bagColorsToFind, innerBagColors).length > 0
+    })
+  }
+
+  return input.filter((bag) => {
+    return bag.innerBags.filter(isMyBag).length > 0
+  })
+}
+
+function isMyBag(bag) {
+  return bag.color === myBag
+}
+
 function solvePuzzle(input) {
-  const outerBagsThatHoldMyBag = input.filter((bag) => {
-    return bag.contains.filter((innerBag) => innerBag.color === myBag).length
-  })
-  // console.table(
-  //   outerBagsThatHoldMyBag.map((bag) => ({
-  //     ...bag,
-  //     contains: JSON.stringify(bag.contains.map((innerBag) => innerBag.color)),
-  //   })),
-  // )
-
-  const innerBagsThatHoldTheOuterBagsThatHoldMyBag = input
-    // Exclude the bags that hold my bag directly
-    .filter((bag) => {
-      return (
-        outerBagsThatHoldMyBag.filter((outerBag) => {
-          return outerBag.color === bag.color
-        }).length === 0
-      )
-    })
-    // Look for inner bags which hold the outer bags (which hold my bag)
-    .filter((bag) => {
-      return bag.contains.filter((innerBag) => {
-        return outerBagsThatHoldMyBag.filter((outerBag) => {
-          return outerBag.color === innerBag.color
-        }).length
-      }).length
-    })
-  // console.table(
-  //   innerBagsThatHoldTheOuterBagsThatHoldMyBag.map((bag) => ({
-  //     ...bag,
-  //     contains: JSON.stringify(bag.contains.map((innerBag) => innerBag.color)),
-  //   })),
-  // )
-
-  const combinedBags = [
-    ...outerBagsThatHoldMyBag,
-    ...innerBagsThatHoldTheOuterBagsThatHoldMyBag,
-  ].sort((a, b) => {
-    const nameA = a.color.toUpperCase() // ignore upper and lowercase
-    const nameB = b.color.toUpperCase() // ignore upper and lowercase
-    if (nameA < nameB) {
-      return -1
-    }
-    if (nameA > nameB) {
-      return 1
-    }
-
-    // names must be equal
-    return 0
-  })
-  console.table(
-    combinedBags.map((bag) => ({
-      ...bag,
-      // contains: JSON.stringify(bag.contains.map((innerBag) => innerBag.color)),
-      contains: JSON.stringify(bag.contains),
-    })),
-  )
+  const level1Bags = getBags(input)
+  const level2Bags = getBags(input, level1Bags)
+  // const level3Bags = getBags(input, [...level1Bags, ...level2Bags])
+  const level3Bags = getBags(input, level2Bags)
+  const level4Bags = getBags(input, level3Bags)
+  const level5Bags = getBags(input, level4Bags)
+  const level6Bags = getBags(input, level5Bags)
+  const level7Bags = getBags(input, level6Bags)
+  const level8Bags = getBags(input, level7Bags)
+  const level9Bags = getBags(input, level8Bags)
+  const level10Bags = getBags(input, level9Bags)
+  const level11Bags = getBags(input, level10Bags)
+  const level12Bags = getBags(input, level11Bags)
+  const level13Bags = getBags(input, level12Bags)
+  const level14Bags = getBags(input, level13Bags)
+  const level15Bags = getBags(input, level14Bags)
 
   // Test input answer is `4`
   // INFO: `39` is not the correct answer
-  return combinedBags.length
+  const solution = [
+    ...new Set(
+      [
+        ...level1Bags,
+        ...level2Bags,
+        ...level3Bags,
+        ...level4Bags,
+        ...level5Bags,
+        ...level6Bags,
+        ...level7Bags,
+        ...level8Bags,
+        ...level9Bags,
+        ...level10Bags,
+        ...level11Bags,
+        ...level12Bags,
+        ...level13Bags,
+        ...level14Bags,
+        ...level15Bags,
+      ]
+        .map((bag) => bag.color)
+        .sort(),
+    ),
+  ]
+
+  console.log(solution)
+
+  return solution.length
+  // return [...new Set([...level1Bags, ...level2Bags])]
+  // return [...new Set(level1Bags)]
+  // return JSON.stringify({ level1Bags, level2Bags, level3Bags }, null, 2)
 }
 
 function solvePartTwo(input) {
