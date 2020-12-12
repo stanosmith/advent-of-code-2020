@@ -5,8 +5,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/7
 
-const inputPath = './input.txt'
-// const inputPath = './test-input.txt'
+// const inputPath = './input.txt'
+const inputPath = './test-input.txt'
 
 const myBag = 'shiny gold'
 
@@ -31,11 +31,11 @@ getInput(inputPath)
     // console.log(JSON.stringify(solution, null, 2))
     console.log('---')
 
-    // console.log('---')
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer ⭐️`)
-    // console.log(solutionPartTwo)
-    // console.log('---')
+    console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log(`Part two puzzle answer ⭐️`)
+    console.log(solutionPartTwo)
+    console.log('---')
 
     console.log('Merry Christmas! 🎄')
   })
