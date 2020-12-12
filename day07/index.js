@@ -6,7 +6,8 @@ const { getInput } = require('../helpers')
 // https://adventofcode.com/2020/day/7
 
 // const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+// const inputPath = './test-input.txt'
+const inputPath = './test-input-part-2.txt'
 
 const myBag = 'shiny gold'
 
@@ -29,11 +30,10 @@ getInput(inputPath)
     console.log(`OG puzzle answer ⭐️`)
     console.log(solution)
     // console.log(JSON.stringify(solution, null, 2))
-    console.log('---')
 
     console.log('---')
     const solutionPartTwo = solvePartTwo(preppedInput)
-    console.log(`Part two puzzle answer ⭐️`)
+    console.log(`Part two puzzle answer ⭐️⭐️`)
     console.log(solutionPartTwo)
     console.log('---')
 
@@ -175,5 +175,6 @@ function solvePuzzle(input) {
 }
 
 function solvePartTwo(input) {
+  // Test part-2 input total = 126
   return 0
 }
