@@ -59,7 +59,6 @@ function solvePuzzle(bootCode) {
     // If no instruction is found, break out of the loop
     if (!instruction) {
       terminatedNormally = true
-      debugger
       break
     }
 
@@ -85,7 +84,6 @@ function solvePuzzle(bootCode) {
         instructionIndex = instruction.argument + instructionIndex
         break
       default:
-        debugger
         throw new Error(
           `Cannot perform unknown operation "${instruction.operation}" with argument "${instruction.argument}"`,
         )
