@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/8
 
-const inputPath = './input.txt'
-// const inputPath = './test-input.txt'
+// const inputPath = './input.txt'
+const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -28,10 +28,10 @@ getInput(inputPath)
     console.log(solution)
     // console.log(JSON.stringify(solution, null, 2))
 
-    // console.log('---')
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer ⭐️⭐️`)
-    // console.log(solutionPartTwo)
+    console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log(`Part two puzzle answer ⭐️⭐️`)
+    console.log(solutionPartTwo)
 
     console.log('---')
     console.log('Merry Christmas! 🎄')
@@ -56,7 +56,6 @@ function solvePuzzle(bootCode) {
 
     // Check if this instruction has already been run
     if (executedInstructions.indexOf(instruction.signature) !== -1) {
-      debugger
       // Kill the boot loop
       booting = false
       break
@@ -84,11 +83,8 @@ function solvePuzzle(bootCode) {
 
     // Add the instruction signature to the list of executions
     executedInstructions.push(instruction.signature)
-
-    debugger
   }
 
-  debugger
   return accumulator
 }
 
