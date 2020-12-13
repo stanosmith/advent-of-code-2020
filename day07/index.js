@@ -5,9 +5,9 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/7
 
-// const inputPath = './input.txt'
+const inputPath = './input.txt'
 // const inputPath = './test-input.txt'
-const inputPath = './test-input-part-2.txt'
+// const inputPath = './test-input-part-2.txt'
 
 const myBagColor = 'shiny gold'
 
@@ -90,16 +90,53 @@ function solvePuzzle(input) {
 |
 */
 function solvePartTwo(input) {
-  logBags(input)
+  const bags = prepInputForPartTwo(input)
+  console.log(bags)
+  return getBagCount(bags, myBagColor)
 
-  const myBag = input.find(isMyBag)
-  const startingBags = addCountToInnerBag(input, myBag)
-  const totalBagsInsideMyBag = addBags(input, startingBags)
+  // Earlier attempt
+  // logBags(input)
+  //
+  // const myBag = input.find(isMyBag)
+  // const startingBags = addCountToInnerBag(input, myBag)
+  // const totalBagsInsideMyBag = addBags(input, startingBags)
+  //
+  // // logBags(totalBagsInsideMyBag)
+  //
+  // // Test part-2 input total = 126
+  // return totalBagsInsideMyBag
+}
 
-  // logBags(totalBagsInsideMyBag)
+function prepInputForPartTwo(input) {
+  return input.reduce((bagDictionary, bag) => {
+    const innerBags = bag.innerBags.reduce((innerBagDictionary, innerBag) => {
+      return {
+        ...innerBagDictionary,
+        [innerBag.color]: innerBag.count,
+      }
+    }, {})
+    return {
+      ...bagDictionary,
+      [bag.color]: {
+        ...innerBags,
+      },
+    }
+  }, {})
+}
 
-  // Test part-2 input total = 126
-  return totalBagsInsideMyBag
+function getBagCount(bags, type) {
+  let total = 0
+
+  const contents = bags[type]
+  debugger
+  Object.entries(contents).forEach(([type, count]) => {
+    debugger
+    total += count
+    total += getBagCount(bags, type) * count
+  })
+
+  debugger
+  return total
 }
 
 function logBags(bags) {
