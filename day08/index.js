@@ -7,8 +7,6 @@ const { getInput } = require('../helpers')
 // const inputPath = './input.txt'
 const inputPath = './test-input.txt'
 
-let accumulator = 0
-
 getInput(inputPath)
   .then((res) => {
     console.log('---')
@@ -24,11 +22,11 @@ getInput(inputPath)
     console.log(preppedInput)
     // console.log(JSON.stringify(preppedInput, null, 2))
 
-    // console.log('---')
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
-    // // console.log(JSON.stringify(solution, null, 2))
+    console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
+    // console.log(JSON.stringify(solution, null, 2))
 
     // console.log('---')
     // const solutionPartTwo = solvePartTwo(preppedInput)
@@ -45,7 +43,47 @@ getInput(inputPath)
 | Solve Puzzle - Part 1
 |
 */
-function solvePuzzle(input) {
+function solvePuzzle(bootCode) {
+  let booting = true
+  let accumulator = 0
+  let executedInstructions = []
+  let instructionIndex = 0
+  let instruction
+
+  while (booting) {
+    // Store the instruction for this loop
+    instruction = bootCode[instructionIndex]
+
+    // Check if this instruction has already been run
+    if (executedInstructions.indexOf(instruction.signature) !== -1) {
+      debugger
+      // Kill the boot loop
+      booting = false
+    } else {
+      switch (instruction.operation) {
+        // If this is a `No OP`, go to the next instruction with no further changes
+        case 'nop':
+          instructionIndex++
+          break
+        // Update the accumulator
+        // case 'acc':
+        //   accumulator = instruction.argument + accumulator
+        //   break
+        default:
+          throw new Error(
+            `Cannot perform unknown operation "${instruction.operation}" with argument "${instruction.argument}"`,
+          )
+      }
+      //
+      // instructionIndex = instruction.argument + instructionIndex
+
+      // Add the instruction signature to the list of executions
+      executedInstructions.push(instruction.signature)
+
+      debugger
+    }
+  }
+
   return 0
 }
 
@@ -67,7 +105,7 @@ function prepInput(input) {
   return input.map((instruction) => {
     const [operation, argument] = instruction.split(' ')
     return {
-      // ogInstruction: instruction,
+      signature: instruction,
       operation,
       argument: parseInt(argument),
     }
