@@ -7,6 +7,8 @@ const { getInput } = require('../helpers')
 // const inputPath = './input.txt'
 const inputPath = './test-input.txt'
 
+let accumulator = 0
+
 getInput(inputPath)
   .then((res) => {
     console.log('---')
@@ -19,6 +21,7 @@ getInput(inputPath)
     const preppedInput = prepInput(input)
     console.log(`Prepped input:`)
     console.log('preppedInput.length', preppedInput.length)
+    console.log(preppedInput)
     // console.log(JSON.stringify(preppedInput, null, 2))
 
     // console.log('---')
@@ -61,5 +64,12 @@ function solvePartTwo(input) {
 |
 */
 function prepInput(input) {
-  return input
+  return input.map((instruction) => {
+    const [operation, argument] = instruction.split(' ')
+    return {
+      // ogInstruction: instruction,
+      operation,
+      argument: parseInt(argument),
+    }
+  })
 }
