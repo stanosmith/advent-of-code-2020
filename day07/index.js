@@ -49,6 +49,15 @@ function isNotMyBag(bag) {
   return bag.color !== myBagColor
 }
 
+function bagMatchesColor(color, bag) {
+  return bag.color === color
+}
+
+/*
+|
+| Solve Puzzle - Part 1
+|
+*/
 function solvePuzzle(input) {
   // Adjust the initial input data
   input = input
@@ -75,17 +84,22 @@ function solvePuzzle(input) {
   return solution.length
 }
 
+/*
+|
+| Solve Puzzle - Part 2
+|
+*/
 function solvePartTwo(input) {
-  const allBagsInsideMyBag = addBags(
-    input,
-    input.filter(isMyBag).map((bag) => ({ ...bag, count: 0 })),
-  )
-
   logBags(input)
-  // logBags(allBagsInsideMyBag)
+
+  const myBag = input.find(isMyBag)
+  const startingBags = addCountToInnerBag(input, myBag)
+  const totalBagsInsideMyBag = addBags(input, startingBags)
+
+  // logBags(totalBagsInsideMyBag)
 
   // Test part-2 input total = 126
-  return allBagsInsideMyBag
+  return totalBagsInsideMyBag
 }
 
 function logBags(bags) {
@@ -102,19 +116,63 @@ function logBags(bags) {
   }
 }
 
-function addBags(input, bagsToAdd, subtotal = 0) {
-  const bagsToSearch = intersectionBy(input, bagsToAdd, 'color')
+function getBagTotal(total, bag) {
+  return total + bag.count
+}
 
-  // subtotal = bagCount + (bagCount * innerBagsTotal)
+function addCountToInnerBag(input, bag) {
+  return bag.innerBags.map((innerBag) => {
+    const { innerBags } = input.find(bagMatchesColor.bind(null, innerBag.color))
+    return {
+      ...innerBag,
+      innerBags,
+    }
+  })
+}
+
+function addBags(input, bagsToAdd, subtotal = 0) {
   debugger
 
-  const newBags = bagsToSearch.map((bag) => bag.innerBags)
+  // Keep track of the running total
+  subtotal = bagsToAdd.reduce((total, bag, bagIndex, allBags) => {
+    // const prevTotal = total
+    const bagCount = bag.count
+    const innerBagsTotal = bag.innerBags.reduce(getBagTotal, 0)
+    total = total + bagCount + bagCount * innerBagsTotal
 
-  subtotal++
+    debugger
 
-  // if (newBags.length) {
-  //   return addBags(input, newBags, subtotal)
-  // }
+    return total
+  }, subtotal)
+
+  // Figure out if we should loop through again
+  const bagsWithInnerBags = bagsToAdd.filter((bag) => bag.innerBags.length > 0)
+  // const bagsToSearch = intersectionBy(input, bagsToAdd, 'color')
+
+  debugger
+
+  // const moreBagsToAdd = bagsToSearch.map((bag) => bag.innerBags)
+
+  if (bagsWithInnerBags.length) {
+    // create array of bags with count and inner bags
+    const moreBagsToAdd = bagsWithInnerBags
+      .map(addCountToInnerBag.bind(null, input))
+      .flat()
+    debugger
+
+    return addBags(input, moreBagsToAdd, subtotal)
+    // return addBags(
+    //   input,
+    //   [
+    //     {
+    //       color: 'dark yellow',
+    //       count: 2,
+    //       innerBags: [{ color: 'dark green', count: 2 }],
+    //     },
+    //   ],
+    //   subtotal,
+    // )
+  }
 
   // Each loop should
 
@@ -183,6 +241,11 @@ function getBags(input, bagsToSearchFor, allBags = []) {
   return allBags
 }
 
+/*
+|
+| Prep Input
+|
+*/
 function prepInput(input) {
   return input.map((entry) => {
     return (
