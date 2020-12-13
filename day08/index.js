@@ -59,32 +59,35 @@ function solvePuzzle(bootCode) {
       debugger
       // Kill the boot loop
       booting = false
-    } else {
-      switch (instruction.operation) {
-        // If this is a `No OP`, go to the next instruction with no further changes
-        case 'nop':
-          instructionIndex++
-          break
-        // Update the accumulator
-        // case 'acc':
-        //   accumulator = instruction.argument + accumulator
-        //   break
-        default:
-          throw new Error(
-            `Cannot perform unknown operation "${instruction.operation}" with argument "${instruction.argument}"`,
-          )
-      }
-      //
-      // instructionIndex = instruction.argument + instructionIndex
-
-      // Add the instruction signature to the list of executions
-      executedInstructions.push(instruction.signature)
-
-      debugger
+      break
     }
+
+    // Execute instruction based on the type of operation
+    switch (instruction.operation) {
+      // If this is a `No OP`, go to the next instruction with no further changes
+      case 'nop':
+        instructionIndex++
+        break
+      // Update the accumulator
+      case 'acc':
+        accumulator = instruction.argument + accumulator
+        instructionIndex++
+        break
+      default:
+        throw new Error(
+          `Cannot perform unknown operation "${instruction.operation}" with argument "${instruction.argument}"`,
+        )
+    }
+    //
+    // instructionIndex = instruction.argument + instructionIndex
+
+    // Add the instruction signature to the list of executions
+    executedInstructions.push(instruction.signature)
+
+    debugger
   }
 
-  return 0
+  return accumulator
 }
 
 /*
