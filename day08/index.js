@@ -4,14 +4,14 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/8
 
-// const inputPath = './input.txt'
+const inputPath = './input.txt'
 // const inputPath = './test-input.txt'
-const inputPath = './test-input-part-2.txt'
+// const inputPath = './test-input-part-2.txt'
 
 getInput(inputPath)
   .then((res) => {
     console.log('---')
-    const input = res.split('\n')
+    const input = res.split('\n').filter((entry) => entry !== '')
     console.log(`OG input:`)
     console.log('input.length', input.length)
     console.log(input)
@@ -59,6 +59,7 @@ function solvePuzzle(bootCode) {
     // If no instruction is found, break out of the loop
     if (!instruction) {
       terminatedNormally = true
+      debugger
       break
     }
 
@@ -84,6 +85,7 @@ function solvePuzzle(bootCode) {
         instructionIndex = instruction.argument + instructionIndex
         break
       default:
+        debugger
         throw new Error(
           `Cannot perform unknown operation "${instruction.operation}" with argument "${instruction.argument}"`,
         )
@@ -102,35 +104,46 @@ function solvePuzzle(bootCode) {
 |
 */
 function solvePartTwo(input) {
-  // TODO: Loop through all permutations of replacing a single `nop` with `jmp` or `jmp` with `nop`
+  // Loop through all permutations of replacing a single `nop` with `jmp` or `jmp` with `nop`
   const allNop = input
     .filter(instructionWithOperation.bind(null, 'nop'))
-    .map((instructionA) => {
-      const adjustedInput = input.map((instructionB) => {
-        if (instructionB.signature === instructionA.signature) {
-          // Replace `nop` with `jmp`
-          const replacementOperation = 'jmp'
-          const signature = instructionB.signature.replace(
-            'nop',
-            replacementOperation,
-          )
-          const operation = replacementOperation
-          return {
-            ...instructionB,
-            signature,
-            operation,
-          }
-        }
-        return instructionB
-      })
-      return solvePuzzle(adjustedInput)
-    })
-  const allJmps = input.filter((instruction) => instruction.operation === 'jmp')
-  return [...allNop, ...allJmps]
+    // Replace `nop` with `jmp`
+    .map(solveForPermutation.bind(null, input, 'jmp'))
+  const allJmp = input
+    .filter(instructionWithOperation.bind(null, 'jmp'))
+    // Replace `jmp` with `nop`
+    .map(solveForPermutation.bind(null, input, 'nop'))
+
+  return [...allNop, ...allJmp].filter(
+    (execution) => execution.terminatedNormally,
+  )
 }
 
 function instructionWithOperation(operation, instruction) {
   return instruction.operation === operation
+}
+
+function solveForPermutation(input, replacementOperation, instructionA) {
+  const adjustedInput = input.map((instructionB) => {
+    if (instructionB.signature === instructionA.signature) {
+      const ogOperation = instructionB.operation
+      const signature = instructionB.signature.replace(
+        ogOperation,
+        replacementOperation,
+      )
+      const operation = replacementOperation
+
+      return {
+        ...instructionB,
+        signature,
+        operation,
+      }
+    }
+
+    return instructionB
+  })
+
+  return solvePuzzle(adjustedInput)
 }
 
 /*
