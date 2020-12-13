@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/8
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -73,13 +73,14 @@ function solvePuzzle(bootCode) {
         accumulator = instruction.argument + accumulator
         instructionIndex++
         break
+      case 'jmp':
+        instructionIndex = instruction.argument + instructionIndex
+        break
       default:
         throw new Error(
           `Cannot perform unknown operation "${instruction.operation}" with argument "${instruction.argument}"`,
         )
     }
-    //
-    // instructionIndex = instruction.argument + instructionIndex
 
     // Add the instruction signature to the list of executions
     executedInstructions.push(instruction.signature)
@@ -87,6 +88,7 @@ function solvePuzzle(bootCode) {
     debugger
   }
 
+  debugger
   return accumulator
 }
 
@@ -105,10 +107,10 @@ function solvePartTwo(input) {
 |
 */
 function prepInput(input) {
-  return input.map((instruction) => {
+  return input.map((instruction, index) => {
     const [operation, argument] = instruction.split(' ')
     return {
-      signature: instruction,
+      signature: `${instruction} ${index}`,
       operation,
       argument: parseInt(argument),
     }
