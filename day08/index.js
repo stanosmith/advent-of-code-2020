@@ -5,7 +5,8 @@ const { getInput } = require('../helpers')
 // https://adventofcode.com/2020/day/8
 
 // const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+// const inputPath = './test-input.txt'
+const inputPath = './test-input-part-2.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -49,10 +50,17 @@ function solvePuzzle(bootCode) {
   let executedInstructions = []
   let instructionIndex = 0
   let instruction
+  let terminatedNormally = false
 
   while (booting) {
     // Store the instruction for this loop
     instruction = bootCode[instructionIndex]
+
+    // If no instruction is found, break out of the loop
+    if (!instruction) {
+      terminatedNormally = true
+      break
+    }
 
     // Check if this instruction has already been run
     if (executedInstructions.indexOf(instruction.signature) !== -1) {
@@ -85,7 +93,7 @@ function solvePuzzle(bootCode) {
     executedInstructions.push(instruction.signature)
   }
 
-  return accumulator
+  return { accumulator, terminatedNormally }
 }
 
 /*
@@ -94,7 +102,35 @@ function solvePuzzle(bootCode) {
 |
 */
 function solvePartTwo(input) {
-  return 0
+  // TODO: Loop through all permutations of replacing a single `nop` with `jmp` or `jmp` with `nop`
+  const allNop = input
+    .filter(instructionWithOperation.bind(null, 'nop'))
+    .map((instructionA) => {
+      const adjustedInput = input.map((instructionB) => {
+        if (instructionB.signature === instructionA.signature) {
+          // Replace `nop` with `jmp`
+          const replacementOperation = 'jmp'
+          const signature = instructionB.signature.replace(
+            'nop',
+            replacementOperation,
+          )
+          const operation = replacementOperation
+          return {
+            ...instructionB,
+            signature,
+            operation,
+          }
+        }
+        return instructionB
+      })
+      return solvePuzzle(adjustedInput)
+    })
+  const allJmps = input.filter((instruction) => instruction.operation === 'jmp')
+  return [...allNop, ...allJmps]
+}
+
+function instructionWithOperation(operation, instruction) {
+  return instruction.operation === operation
 }
 
 /*
