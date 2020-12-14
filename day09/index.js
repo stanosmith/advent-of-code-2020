@@ -62,5 +62,5 @@ function solvePartTwo(input) {
 |
 */
 function prepInput(input) {
-  return input
+  return input.map((entry) => parseInt(entry)).filter((entry) => !isNaN(entry))
 }
