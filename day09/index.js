@@ -4,8 +4,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/9
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -22,10 +22,10 @@ getInput(inputPath)
     console.log(preppedInput)
     // console.log(JSON.stringify(preppedInput, null, 2))
 
-    // console.log('---')
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
+    console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
     // console.log(JSON.stringify(solution, null, 2))
 
     // console.log('---')
@@ -44,7 +44,31 @@ getInput(inputPath)
 |
 */
 function solvePuzzle(input) {
-  return 0
+  const preambleLength = 25
+
+  for (let i = 0; i < input.length; i++) {
+    const sum = input[i + preambleLength]
+    const preamble = input
+      .slice(i, i + preambleLength)
+      .map((addendA, index, addends) => {
+        return addends
+          .map((addendB) => {
+            if (addendA === addendB) {
+              return -1
+            }
+            return addendA + addendB
+          })
+          .filter((preambleSum) => preambleSum !== -1)
+      })
+      .flat()
+      .sort()
+
+    // Validate the sum, if it isn't valid, return it as the solution
+    if ([...new Set(preamble)].indexOf(sum) === -1) {
+      // Answer is `258585477`
+      return sum
+    }
+  }
 }
 
 /*
