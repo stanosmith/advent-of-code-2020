@@ -1,5 +1,7 @@
 'use strict'
 
+const _ = require('lodash')
+
 const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/9
@@ -28,10 +30,10 @@ getInput(inputPath)
     console.log(solution)
     // console.log(JSON.stringify(solution, null, 2))
 
-    // console.log('---')
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer ⭐️⭐️`)
-    // console.log(solutionPartTwo)
+    console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput, solution)
+    console.log(`Part two puzzle answer ⭐️⭐️`)
+    console.log(solutionPartTwo)
 
     console.log('---')
     console.log('Merry Christmas! 🎄')
@@ -44,7 +46,7 @@ getInput(inputPath)
 |
 */
 function solvePuzzle(input) {
-  const preambleLength = 25
+  const preambleLength = inputPath.includes('test') ? 5 : 25
 
   for (let i = 0; i < input.length; i++) {
     const sum = input[i + preambleLength]
@@ -75,9 +77,52 @@ function solvePuzzle(input) {
 |
 | Solve Puzzle - Part 2
 |
+| Find a contiguous set of at least two numbers in your list
+| which sum to the invalid number from step 1
+|
 */
-function solvePartTwo(input) {
-  return 0
+function solvePartTwo(input, invalidNumber) {
+  // Add contiguous numbers till it matches the invalid number,
+  // or is more than it, then start over at the next index
+
+  for (let i = 0; i < input.length; i++) {
+    const { contiguousRange, sum } = getAddendsAndSum(input, i, invalidNumber)
+
+    if (sum === invalidNumber) {
+      // INFO: Find the encryption weakness
+      //  add together the smallest and largest number in this contiguous
+      //  range; for the test input, these are `15` and `47`, producing `62`.
+
+      // INFO: `21046031` is NOT the right answer. It's too LOW
+      return contiguousRange
+        .sort((a, b) => a - b)
+        .filter((addend, index, addends) => {
+          return index === 0 || index === addends.length - 1
+        })
+        .reduce((encryptionWeakness, addend) => {
+          return addend + encryptionWeakness
+        }, 0)
+    }
+  }
+}
+
+function getAddendsAndSum(input, startIndex, invalidNumber) {
+  for (let i = 0; i < input.length; i++) {
+    const endIndex = startIndex + i + 2
+    const contiguousRange = input.slice(startIndex, endIndex)
+    const sum = _.sum(contiguousRange)
+
+    if (endIndex === input.length) {
+      return {
+        contiguousRange,
+        sum,
+      }
+    }
+
+    if (sum >= invalidNumber) {
+      return { contiguousRange, sum }
+    }
+  }
 }
 
 /*
