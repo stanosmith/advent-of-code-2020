@@ -6,8 +6,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/10
 
-const inputPath = './input.txt'
-// const inputPath = './test-input.txt'
+// const inputPath = './input.txt'
+const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -22,18 +22,16 @@ getInput(inputPath)
     console.log(`Prepped input:`)
     console.log('preppedInput.length', preppedInput.length)
     console.log(preppedInput)
-    // console.log(JSON.stringify(preppedInput, null, 2))
 
     console.log('---')
     const solution = solvePuzzle(preppedInput)
     console.log(`OG puzzle answer ⭐️`)
     console.log(solution)
-    // console.log(JSON.stringify(solution, null, 2))
 
-    // console.log('---')
-    // const solutionPartTwo = solvePartTwo(preppedInput, solution)
-    // console.log(`Part two puzzle answer ⭐️⭐️`)
-    // console.log(solutionPartTwo)
+    console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput, solution)
+    console.log(`Part two puzzle answer ⭐️⭐️`)
+    console.log(solutionPartTwo)
 
     console.log('---')
     console.log('Merry Christmas! 🎄')
@@ -53,7 +51,13 @@ getInput(inputPath)
 */
 function solvePuzzle(input) {
   // What is the number of 1-jolt differences multiplied by the number of 3-jolt differences?
-  const { jolt1, jolt3 } = input
+  const { jolt1, jolt3 } = addDiffs(input)
+  // `2812` was the answer
+  return jolt1 * jolt3
+}
+
+function addDiffs(input) {
+  return input
     .map((adapterRating, index, adapterRatings) => {
       const prevRating = index === 0 ? index : adapterRatings[index - 1]
       const diff = adapterRating - prevRating
@@ -74,16 +78,17 @@ function solvePuzzle(input) {
         jolt3: 1, // Start with a +1 to include 3 jolts above the last adapter
       },
     )
-
-  return jolt1 * jolt3
 }
 
 /*
 |
 | Solve Puzzle - Part 2
+| Figure out how many distinct arrangements can be made. Every arrangement needs
+| to connect the charging outlet to your device. The previous rules about when
+| adapters can successfully connect still apply.
 |
-| Find a contiguous set of at least two numbers in your list
-| which sum to the invalid number from step 1
+| Test input answer:
+| `19208` distinct arrangements
 |
 */
 function solvePartTwo(input) {
