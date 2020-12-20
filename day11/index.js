@@ -6,12 +6,14 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/11
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 const seatFloor = '.'
 const seatEmpty = 'L'
 const seatOccupied = '#'
+
+let iteration = 0
 
 getInput(inputPath)
   .then((res) => {
@@ -19,18 +21,18 @@ getInput(inputPath)
     const input = res.split('\n').filter((entry) => entry !== '')
     console.log(`OG input:`)
     console.log('input.length', input.length)
-    console.log(input)
+    console.table(input)
 
     console.log('---')
     const preppedInput = prepInput(input)
     console.log(`Prepped input:`)
     console.log('preppedInput.length', preppedInput.length)
-    console.log(preppedInput)
+    // console.table(preppedInput)
 
-    // console.log('---')
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
+    console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
 
     console.log('---')
     const solutionPartTwo = solvePartTwo(preppedInput)
@@ -59,10 +61,17 @@ function calculateTotal(occupiedSeats, seatRow) {
 }
 
 function recursive(prevResult, applyRulesMethod) {
+  iteration++
+
   const nextResult = applyRulesMethod(prevResult)
 
-  console.table(prevResult)
-  console.table(nextResult)
+  // console.log('prevResult')
+  // console.table(prevResult)
+
+  // debugger
+
+  // console.log('nextResult')
+  // console.table(nextResult)
 
   if (_.isEqual(prevResult, nextResult)) {
     return nextResult
@@ -132,29 +141,31 @@ function solvePartTwo(input) {
 function applyRulesPartTwo(seatingArea) {
   return seatingArea.map((seatRow, rowIndex, allSeatRows) => {
     return seatRow.map((seat, seatIndex, allSeats) => {
+      // if (rowIndex === 0 && seatIndex === allSeats.length - 1) {
+      //   debugger
+      // }
+
       // Floor seats don't change
       if (seat === seatFloor) {
         return seat
       }
 
-      const visibleOccupiedSeats = getVisibleOccupiedSeats(
+      const visibleSeats = getVisibleSeats(
         seatIndex,
         allSeats,
         rowIndex,
         allSeatRows,
       )
-      const numOccupiedAdjacentSeats = visibleOccupiedSeats.filter(
-        (adjacentSeat) => {
-          return adjacentSeat === seatOccupied
-        },
-      ).length
+      const numOccupiedAdjacentSeats = visibleSeats.filter((adjacentSeat) => {
+        return adjacentSeat === seatOccupied
+      }).length
 
       // If a seat is empty (L) and there are no occupied seats adjacent to it, the seat becomes occupied.
       if (seat === seatEmpty && numOccupiedAdjacentSeats === 0) {
         return seatOccupied
       }
 
-      // If a seat is occupied (#) and four or more seats adjacent to it are also occupied, the seat becomes empty.
+      // If a seat is occupied (#) and five or more seats adjacent to it are also occupied, the seat becomes empty.
       if (seat === seatOccupied && numOccupiedAdjacentSeats >= 5) {
         return seatEmpty
       }
@@ -164,37 +175,101 @@ function applyRulesPartTwo(seatingArea) {
   })
 }
 
-function getVisibleOccupiedSeats(seatIndex, allSeats, rowIndex, allSeatRows) {
-  const occupiedRight = findSeatInArray(seatOccupied, allSeats)
-  const occupiedBottomRight = []
-  const occupiedBottomCenter = []
-  const occupiedBottomLeft = []
-  const occupiedLeft = getOccupiedLeft(seatIndex, allSeats)
-  const occupiedTopLeft = []
-  const occupiedTopCenter = []
-  const occupiedTopRight = []
+function getVisibleSeats(seatIndex, allSeats, rowIndex, allSeatRows) {
+  const getFirstVisibleDiagonalSeat = ({ up, left }) => {
+    // Cut out immediately if we're at row 0
+    if (up && rowIndex === 0) {
+      return
+    }
+
+    // Default direction is down
+    let rowsToSearch = allSeatRows.slice(rowIndex + 1)
+    if (up && rowIndex > 0) {
+      // Need to reverse the array in order to step through it
+      rowsToSearch = allSeatRows.slice(0, rowIndex).reverse()
+    }
+
+    if (rowsToSearch) {
+      return rowsToSearch
+        .map((rowToSearch, rowToSearchIndex) => {
+          let visibleSeatIndex = seatIndex + rowToSearchIndex + 1
+
+          if (left) {
+            visibleSeatIndex = seatIndex - rowToSearchIndex - 1
+          }
+
+          return rowToSearch[visibleSeatIndex]
+        })
+        .filter((visibleSeat) => typeof visibleSeat !== 'undefined')
+        .find((visibleSeat, visibleSeatIndex, allVisibleSeats) => {
+          return visibleSeat === seatOccupied || visibleSeat === seatEmpty
+        })
+    }
+  }
+  const getFirstVisibleDown = () => {
+    return allSeatRows
+      .slice(rowIndex + 1)
+      .map((rowToSearch) => {
+        return rowToSearch[seatIndex]
+      })
+      .find((seat) => {
+        return seat === seatOccupied || seat === seatEmpty
+      })
+  }
+  const getFirstVisibleUp = () => {
+    if (rowIndex > 0) {
+      return allSeatRows
+        .slice(0, rowIndex)
+        .reverse()
+        .map((rowToSearch) => {
+          return rowToSearch[seatIndex]
+        })
+        .find((seat) => {
+          return seat === seatOccupied || seat === seatEmpty
+        })
+    }
+  }
+  const visibleRight = findFirstVisibleSeat(allSeats.slice(seatIndex + 1)) // right
+  const visibleDownRight = getFirstVisibleDiagonalSeat({}) // down-right
+  const visibleDown = getFirstVisibleDown() // down
+  const visibleDownLeft = getFirstVisibleDiagonalSeat({ left: true }) // down-left
+  const visibleLeft = getFirstVisibleLeft(seatIndex, allSeats) // left
+  const visibleUpLeft = getFirstVisibleDiagonalSeat({ up: true, left: true }) // up-left
+  const visibleUp = getFirstVisibleUp() // up
+  const visibleUpRight = getFirstVisibleDiagonalSeat({ up: true }) // up-right
+
+  // console.log(
+  //   visibleRight,
+  //   visibleDownRight,
+  //   visibleDown,
+  //   visibleDownLeft,
+  //   visibleLeft,
+  //   visibleUpLeft,
+  //   visibleUp,
+  //   visibleUpRight,
+  // )
+
   return [
-    occupiedRight,
-    occupiedBottomRight,
-    occupiedBottomCenter,
-    occupiedBottomLeft,
-    occupiedLeft,
-    occupiedTopLeft,
-    occupiedTopCenter,
-    occupiedTopRight,
+    visibleRight,
+    visibleDownRight,
+    visibleDown,
+    visibleDownLeft,
+    visibleLeft,
+    visibleUpLeft,
+    visibleUp,
+    visibleUpRight,
   ]
 }
 
-function getOccupiedLeft(seatIndex, allSeats) {
+function getFirstVisibleLeft(seatIndex, allSeats) {
   if (seatIndex > 0) {
-    const seatsToSearch = allSeats.slice(0, seatIndex - 1).reverse()
-    return findSeatInArray(seatOccupied, seatsToSearch)
+    const seatsToSearch = allSeats.slice(0, seatIndex).reverse()
+    return findFirstVisibleSeat(seatsToSearch)
   }
-  return undefined
 }
 
-function findSeatInArray(seat, seats) {
-  return seats.find((item) => item === seat)
+function findFirstVisibleSeat(seats) {
+  return seats.find((item) => item === seatOccupied || item === seatEmpty)
 }
 
 /*
