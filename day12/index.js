@@ -9,6 +9,16 @@ const { getInput } = require('../helpers')
 // const inputPath = './input.txt'
 const inputPath = './test-input.txt'
 
+const ACTION_MAPPING = {
+  N: 'NORTH',
+  S: 'SOUTH',
+  E: 'EAST',
+  W: 'WEST',
+  L: 'LEFT',
+  R: 'RIGHT',
+  F: 'FORWARD',
+}
+
 getInput(inputPath)
   .then((res) => {
     console.log('---')
@@ -53,7 +63,11 @@ getInput(inputPath)
 */
 function solvePuzzle(input) {
   // INFO: What is the Manhattan distance between that location and the ship's starting position?
-  return 0
+  // Manhattan distance = sum of the absolute values of its east/west position and its north/south position
+  // e.g. The test input should be 17 + 8 = 25
+  const eastWest = 0
+  const northSouth = 0
+  return eastWest + northSouth
 }
 
 /*
@@ -71,5 +85,13 @@ function solvePartTwo(input) {
 |
 */
 function prepInput(input) {
-  return input
+  try {
+    return input.map((entry) => ({
+      action: ACTION_MAPPING[entry.slice(0, 1).toUpperCase()],
+      value: parseInt(entry.slice(1)),
+    }))
+  } catch (e) {
+    console.error(e)
+    debugger
+  }
 }
