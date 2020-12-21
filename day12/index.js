@@ -6,8 +6,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/12
 
-const inputPath = './input.txt'
-// const inputPath = './test-input.txt'
+// const inputPath = './input.txt'
+const inputPath = './test-input.txt'
 
 const ACTION_MAPPING = {
   N: 'NORTH',
@@ -48,15 +48,15 @@ getInput(inputPath)
     console.log('preppedInput.length', preppedInput.length)
     // console.table(preppedInput)
 
-    console.log('---')
-    const solution = solvePuzzle(preppedInput)
-    console.log(`OG puzzle answer ⭐️`)
-    console.log(solution)
-
     // console.log('---')
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer ⭐️⭐️`)
-    // console.log(solutionPartTwo)
+    // const solution = solvePuzzle(preppedInput)
+    // console.log(`OG puzzle answer ⭐️`)
+    // console.log(solution)
+
+    console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log(`Part two puzzle answer ⭐️⭐️`)
+    console.log(solutionPartTwo)
 
     console.log('---')
     console.log('Merry Christmas! 🎄')
@@ -117,8 +117,6 @@ function moveNorthSouth(manhattanDistData, action) {
     south += action.value
   }
 
-  debugger
-
   return {
     ...manhattanDistData,
     [ACTION_MAPPING.N]: north,
@@ -138,8 +136,6 @@ function moveEastWest(manhattanDistData, action) {
     west += action.value
   }
 
-  debugger
-
   return {
     ...manhattanDistData,
     [ACTION_MAPPING.E]: east,
@@ -148,7 +144,6 @@ function moveEastWest(manhattanDistData, action) {
 }
 
 function moveForward(manhattanDistData, action) {
-  // debugger
   return ACTION_METHODS[manhattanDistData.shipIsFacing](manhattanDistData, {
     text: manhattanDistData.shipIsFacing,
     value: action.value,
