@@ -6,8 +6,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/12
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 const ACTION_MAPPING = {
   N: 'NORTH',
@@ -79,7 +79,7 @@ getInput(inputPath)
 */
 function solvePuzzle(input) {
   // Loop through all instructions and calculate the north/south, east/west values
-  return input.reduce(
+  const tripResults = input.reduce(
     (manhattanDistData, action) => {
       return {
         ...manhattanDistData,
@@ -95,38 +95,53 @@ function solvePuzzle(input) {
     },
   )
 
+  console.table(tripResults)
+
   // Manhattan distance = sum of the absolute values of its east/west position and its north/south position
   // e.g. The test input should be 17 + 8 = 25
-  // TODO: return eastWest + northSouth
+  const eastWest = Math.abs(tripResults[ACTION_MAPPING.E])
+  const northSouth = Math.abs(tripResults[ACTION_MAPPING.N])
+  return eastWest + northSouth
 }
 
 // TODO: Each method needs to perform it's action and return an update to the object
 function moveNorthSouth(manhattanDistData, action) {
-  const north = manhattanDistData[ACTION_MAPPING.N]
-  const south = manhattanDistData[ACTION_MAPPING.S]
+  let north = manhattanDistData[ACTION_MAPPING.N]
+  let south = manhattanDistData[ACTION_MAPPING.S]
 
-  // debugger
+  if (action.text === ACTION_MAPPING.N) {
+    north += action.value
+    south -= action.value
+  } else {
+    north -= action.value
+    south += action.value
+  }
+
+  debugger
+
   return {
     ...manhattanDistData,
-    // TODO: Update north and south values
-    [ACTION_MAPPING.N]: Math.abs(north - south),
-    [ACTION_MAPPING.S]: Math.min(south - north, 0),
+    [ACTION_MAPPING.N]: north,
+    [ACTION_MAPPING.S]: south,
   }
 }
 
 function moveEastWest(manhattanDistData, action) {
-  // One of these will stay or change to 0
-  const east = manhattanDistData[ACTION_MAPPING.E]
-  const west = manhattanDistData[ACTION_MAPPING.W]
-  const diff = Math.abs(east - west)
+  let east = manhattanDistData[ACTION_MAPPING.E]
+  let west = manhattanDistData[ACTION_MAPPING.W]
 
-  // debugger
+  if (action.text === ACTION_MAPPING.E) {
+    east += action.value
+    west -= action.value
+  } else {
+    east -= action.value
+    west += action.value
+  }
 
-  // TODO: The number needs to be added to east or west depending on the action key
+  debugger
 
   return {
     ...manhattanDistData,
-    // TODO: Update east and west values
     [ACTION_MAPPING.E]: east,
     [ACTION_MAPPING.W]: west,
   }
@@ -134,10 +149,10 @@ function moveEastWest(manhattanDistData, action) {
 
 function moveForward(manhattanDistData, action) {
   // debugger
-  return ACTION_METHODS[manhattanDistData.shipIsFacing](
-    manhattanDistData,
-    action,
-  )
+  return ACTION_METHODS[manhattanDistData.shipIsFacing](manhattanDistData, {
+    text: manhattanDistData.shipIsFacing,
+    value: action.value,
+  })
 }
 
 function rotate(manhattanDistData, action) {
@@ -155,15 +170,6 @@ function rotate(manhattanDistData, action) {
     }
 
     shipIsFacing = COMPASS[newCompassIndex]
-    // With the test input, the direction the ship is facing should follow this order
-    // [0: NORTH, 1: EAST, 2: SOUTH, 3: WEST]
-    // R360 // 1: EAST
-    // L90  // 0: NORTH (1-1 =  0 => index: 0)
-    // L180 // 2: SOUTH (0-2 = -2 => index: 2)
-    // L270 // 3: WEST  (2-3 = -1 => index: 3)
-    // L360 // 3: WEST  (3-4 = -1 => index: 3)
-    // L450 // 2: SOUTH (3-5 = -2 => index: 2)
-    console.table({ newCompassIndex })
   }
 
   console.log(
