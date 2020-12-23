@@ -18,15 +18,6 @@ const ACTION_MAPPING = {
   R: 'RIGHT',
   F: 'FORWARD',
 }
-const ACTION_METHODS = {
-  [ACTION_MAPPING.N]: moveNorthSouth,
-  [ACTION_MAPPING.S]: moveNorthSouth,
-  [ACTION_MAPPING.E]: moveEastWest,
-  [ACTION_MAPPING.W]: moveEastWest,
-  [ACTION_MAPPING.L]: rotate,
-  [ACTION_MAPPING.R]: rotate,
-  [ACTION_MAPPING.F]: moveForward,
-}
 const COMPASS = [
   ACTION_MAPPING.N,
   ACTION_MAPPING.E,
@@ -78,12 +69,21 @@ getInput(inputPath)
 |
 */
 function solvePuzzle(input) {
+  const actionMethods = {
+    [ACTION_MAPPING.N]: moveNorthSouth,
+    [ACTION_MAPPING.S]: moveNorthSouth,
+    [ACTION_MAPPING.E]: moveEastWest,
+    [ACTION_MAPPING.W]: moveEastWest,
+    [ACTION_MAPPING.L]: rotate,
+    [ACTION_MAPPING.R]: rotate,
+    [ACTION_MAPPING.F]: moveForward,
+  }
   // Loop through all instructions and calculate the north/south, east/west values
   const tripResults = input.reduce(
     (manhattanDistData, action) => {
       return {
         ...manhattanDistData,
-        ...ACTION_METHODS[action.text](manhattanDistData, action),
+        ...actionMethods[action.text](manhattanDistData, action, actionMethods),
       }
     },
     {
@@ -143,8 +143,8 @@ function moveEastWest(manhattanDistData, action) {
   }
 }
 
-function moveForward(manhattanDistData, action) {
-  return ACTION_METHODS[manhattanDistData.shipIsFacing](manhattanDistData, {
+function moveForward(manhattanDistData, action, actionMethods) {
+  return actionMethods[manhattanDistData.shipIsFacing](manhattanDistData, {
     text: manhattanDistData.shipIsFacing,
     value: action.value,
   })
