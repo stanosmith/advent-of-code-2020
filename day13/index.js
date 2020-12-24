@@ -6,8 +6,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/13
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 getInput(inputPath)
   .then((res) => {
@@ -20,13 +20,13 @@ getInput(inputPath)
     console.log('---')
     const preppedInput = prepInput(input)
     console.log(`Prepped input:`)
-    console.log('preppedInput.length', preppedInput.length)
+    // console.log('preppedInput.length', preppedInput.length)
     console.log(preppedInput)
 
-    // console.log('---')
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
+    console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
 
     // console.log('---')
     // const solutionPartTwo = solvePartTwo(preppedInput)
@@ -44,7 +44,29 @@ getInput(inputPath)
 |
 */
 function solvePuzzle(input) {
-  return 0
+  let timestamp = input.earliestDeparture - 1
+  let busDeparted
+  let minutesToWait
+
+  while (typeof busDeparted === 'undefined') {
+    timestamp++
+    let possibleDepartures = input.busIds.map((busId) => {
+      // console.log('timestamp % busId', timestamp % busId)
+      return timestamp % busId === 0
+        ? { id: busId, departed: true }
+        : { id: busId, departed: false }
+    })
+    busDeparted = possibleDepartures.find(
+      (departure) => departure.departed === true,
+    )
+    console.table(possibleDepartures)
+  }
+
+  console.table(busDeparted)
+
+  minutesToWait = timestamp - input.earliestDeparture
+
+  return minutesToWait * busDeparted.id
 }
 
 /*
@@ -63,7 +85,15 @@ function solvePartTwo(input) {
 */
 function prepInput(input) {
   try {
-    return input
+    return {
+      earliestDeparture: parseInt(input[0]),
+      busIds: input[1]
+        .split(',')
+        .map((busId) => parseInt(busId))
+        .filter((busId) => !isNaN(busId))
+        // Sort lowest to highest
+        .sort((a, b) => a - b),
+    }
   } catch (e) {
     console.error(e)
     debugger
