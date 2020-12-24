@@ -6,8 +6,8 @@ const { getInput } = require('../helpers')
 
 // https://adventofcode.com/2020/day/12
 
-// const inputPath = './input.txt'
-const inputPath = './test-input.txt'
+const inputPath = './input.txt'
+// const inputPath = './test-input.txt'
 
 const ACTION_MAPPING = {
   N: 'NORTH',
@@ -24,6 +24,32 @@ const COMPASS = [
   ACTION_MAPPING.S,
   ACTION_MAPPING.W,
 ]
+const ACTION_METHODS_SHARED = {
+  [ACTION_MAPPING.N]: moveAlongAxis.bind(
+    null,
+    ACTION_MAPPING.N,
+    ACTION_MAPPING.S,
+  ),
+  [ACTION_MAPPING.S]: moveAlongAxis.bind(
+    null,
+    ACTION_MAPPING.S,
+    ACTION_MAPPING.N,
+  ),
+  [ACTION_MAPPING.E]: moveAlongAxis.bind(
+    null,
+    ACTION_MAPPING.E,
+    ACTION_MAPPING.W,
+  ),
+  [ACTION_MAPPING.W]: moveAlongAxis.bind(
+    null,
+    ACTION_MAPPING.W,
+    ACTION_MAPPING.E,
+  ),
+}
+const DIRECTION_COUNTERPARTS = [
+  [ACTION_MAPPING.N, ACTION_MAPPING.S],
+  [ACTION_MAPPING.E, ACTION_MAPPING.W],
+]
 
 getInput(inputPath)
   .then((res) => {
@@ -39,10 +65,11 @@ getInput(inputPath)
     console.log('preppedInput.length', preppedInput.length)
     // console.table(preppedInput)
 
-    // console.log('---')
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
+    console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    // Solution was `923`
+    console.log(solution)
 
     console.log('---')
     const solutionPartTwo = solvePartTwo(preppedInput)
@@ -70,26 +97,7 @@ getInput(inputPath)
 */
 function solvePuzzle(input) {
   const actionMethods = {
-    [ACTION_MAPPING.N]: moveAlongAxis.bind(
-      null,
-      ACTION_MAPPING.N,
-      ACTION_MAPPING.S,
-    ),
-    [ACTION_MAPPING.S]: moveAlongAxis.bind(
-      null,
-      ACTION_MAPPING.S,
-      ACTION_MAPPING.N,
-    ),
-    [ACTION_MAPPING.E]: moveAlongAxis.bind(
-      null,
-      ACTION_MAPPING.E,
-      ACTION_MAPPING.W,
-    ),
-    [ACTION_MAPPING.W]: moveAlongAxis.bind(
-      null,
-      ACTION_MAPPING.W,
-      ACTION_MAPPING.E,
-    ),
+    ...ACTION_METHODS_SHARED,
     [ACTION_MAPPING.L]: rotate,
     [ACTION_MAPPING.R]: rotate,
     [ACTION_MAPPING.F]: moveForward,
@@ -189,9 +197,137 @@ function getAllActionSums(input) {
 |
 | Solve Puzzle - Part 2
 |
+| Action N means to move the waypoint north by the given value.
+| Action S means to move the waypoint south by the given value.
+| Action E means to move the waypoint east by the given value.
+| Action W means to move the waypoint west by the given value.
+| Action L means to rotate the waypoint around the ship left (counter-clockwise) the given number of degrees.
+| Action R means to rotate the waypoint around the ship right (clockwise) the given number of degrees.
+| Action F means to move forward to the waypoint a number of times equal to the given value.
+|
 */
 function solvePartTwo(input) {
-  return 0
+  const actionMethods = {
+    ...ACTION_METHODS_SHARED,
+    [ACTION_MAPPING.L]: rotateWaypoint,
+    [ACTION_MAPPING.R]: rotateWaypoint,
+    [ACTION_MAPPING.F]: moveShipForward,
+  }
+  const tripResults = input.reduce(
+    (manhattanDistData, action) => {
+      return {
+        ...manhattanDistData,
+        ...actionMethods[action.text](manhattanDistData, action, actionMethods),
+      }
+    },
+    {
+      [ACTION_MAPPING.N]: 1,
+      [ACTION_MAPPING.S]: -1,
+      [ACTION_MAPPING.E]: 10,
+      [ACTION_MAPPING.W]: -10,
+      ship: {
+        [ACTION_MAPPING.N]: 0,
+        [ACTION_MAPPING.S]: 0,
+        [ACTION_MAPPING.E]: 0,
+        [ACTION_MAPPING.W]: 0,
+      },
+      shipIsFacing: ACTION_MAPPING.E, // Ship starts facing EAST
+    },
+  )
+
+  const { ship, shipIsFacing, ...rest } = tripResults
+  console.table({
+    ship: { ...ship, shipIsFacing },
+    waypoint: rest,
+  })
+
+  const eastWest = Math.abs(tripResults.ship[ACTION_MAPPING.E])
+  const northSouth = Math.abs(tripResults.ship[ACTION_MAPPING.N])
+  return eastWest + northSouth
+}
+
+function rotateWaypoint(manhattanDistData, action) {
+  // TODO: Use the COMPASS array to roll the position left/right
+  // The 2 coordinates will always be right next to each other in the COMPASS array
+  //    ['NORTH','EAST','SOUTH','WEST']
+  // 1. | 10    | 4 ▶  |       |      |
+  // 2. |       | 10   | 4 ▼   |      |
+
+  // Previous facing direction
+  const directionShipWasFacing = manhattanDistData.shipIsFacing
+  const directionShipWasFacingValue = manhattanDistData[directionShipWasFacing]
+  const directionShipWasFacingIndex = COMPASS.indexOf(directionShipWasFacing)
+  const directionCrossShipWasFacing =
+    directionShipWasFacingIndex !== 0
+      ? COMPASS[directionShipWasFacingIndex - 1]
+      : COMPASS[COMPASS.length - 1]
+  const crossShipWasFacingValue = manhattanDistData[directionCrossShipWasFacing]
+
+  // Updated facing direction
+  const directionShipIsFacing = rotate(manhattanDistData, action).shipIsFacing
+  const directionShipIsFacingIndex = COMPASS.indexOf(directionShipIsFacing)
+  const directionShipIsFacingOpposite = getOppositeDirection(
+    directionShipIsFacing,
+  )
+
+  const directionCrossShipIsFacing =
+    directionShipIsFacingIndex !== 0
+      ? COMPASS[directionShipIsFacingIndex - 1]
+      : COMPASS[COMPASS.length - 1]
+  const crossShipIsFacingOpposite = getOppositeDirection(
+    directionCrossShipIsFacing,
+  )
+
+  return {
+    ...manhattanDistData,
+    [directionShipIsFacing]: directionShipWasFacingValue,
+    [directionShipIsFacingOpposite]: -directionShipWasFacingValue,
+    [directionCrossShipIsFacing]: crossShipWasFacingValue,
+    [crossShipIsFacingOpposite]: -crossShipWasFacingValue,
+    shipIsFacing: directionShipIsFacing,
+  }
+}
+
+function getOppositeDirection(isFacing) {
+  return DIRECTION_COUNTERPARTS.filter((counterparts) => {
+    return counterparts.indexOf(isFacing) !== -1
+  })
+    .flat()
+    .find((counterpart) => {
+      return counterpart !== isFacing
+    })
+}
+
+function moveShipForward(manhattanDistData, action) {
+  // Result for each TEST iteration:
+  // F10: east 100, north 10
+  // F7:  east 170, north 38
+  // F11: east 214, south 72
+  // TODO: Should be +/- depending on the current value
+  const prevShipNorth = manhattanDistData.ship[ACTION_MAPPING.N]
+  const prevShipSouth = manhattanDistData.ship[ACTION_MAPPING.S]
+  const prevShipEast = manhattanDistData.ship[ACTION_MAPPING.E]
+  const prevShipWest = manhattanDistData.ship[ACTION_MAPPING.W]
+
+  const travelDistanceNorth = manhattanDistData[ACTION_MAPPING.N] * action.value
+  const travelDistanceSouth = manhattanDistData[ACTION_MAPPING.S] * action.value
+  const travelDistanceEast = manhattanDistData[ACTION_MAPPING.E] * action.value
+  const travelDistanceWest = manhattanDistData[ACTION_MAPPING.W] * action.value
+
+  const updatedShipNorth = prevShipNorth + travelDistanceNorth
+  const updatedShipSouth = prevShipSouth + travelDistanceSouth
+  const updatedShipEast = prevShipEast + travelDistanceEast
+  const updatedShipWest = prevShipWest + travelDistanceWest
+
+  return {
+    ...manhattanDistData,
+    ship: {
+      [ACTION_MAPPING.N]: updatedShipNorth,
+      [ACTION_MAPPING.S]: updatedShipSouth,
+      [ACTION_MAPPING.E]: updatedShipEast,
+      [ACTION_MAPPING.W]: updatedShipWest,
+    },
+  }
 }
 
 /*
