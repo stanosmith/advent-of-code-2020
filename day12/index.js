@@ -70,10 +70,26 @@ getInput(inputPath)
 */
 function solvePuzzle(input) {
   const actionMethods = {
-    [ACTION_MAPPING.N]: moveNorthSouth,
-    [ACTION_MAPPING.S]: moveNorthSouth,
-    [ACTION_MAPPING.E]: moveEastWest,
-    [ACTION_MAPPING.W]: moveEastWest,
+    [ACTION_MAPPING.N]: moveAlongAxis.bind(
+      null,
+      ACTION_MAPPING.N,
+      ACTION_MAPPING.S,
+    ),
+    [ACTION_MAPPING.S]: moveAlongAxis.bind(
+      null,
+      ACTION_MAPPING.S,
+      ACTION_MAPPING.N,
+    ),
+    [ACTION_MAPPING.E]: moveAlongAxis.bind(
+      null,
+      ACTION_MAPPING.E,
+      ACTION_MAPPING.W,
+    ),
+    [ACTION_MAPPING.W]: moveAlongAxis.bind(
+      null,
+      ACTION_MAPPING.W,
+      ACTION_MAPPING.E,
+    ),
     [ACTION_MAPPING.L]: rotate,
     [ACTION_MAPPING.R]: rotate,
     [ACTION_MAPPING.F]: moveForward,
@@ -104,42 +120,22 @@ function solvePuzzle(input) {
   return eastWest + northSouth
 }
 
-// TODO: Each method needs to perform it's action and return an update to the object
-function moveNorthSouth(manhattanDistData, action) {
-  let north = manhattanDistData[ACTION_MAPPING.N]
-  let south = manhattanDistData[ACTION_MAPPING.S]
+function moveAlongAxis(directionA, directionB, manhattanDistData, action) {
+  let a = manhattanDistData[directionA]
+  let b = manhattanDistData[directionB]
 
-  if (action.text === ACTION_MAPPING.N) {
-    north += action.value
-    south -= action.value
+  if (action.text === directionA) {
+    a += action.value
+    b -= action.value
   } else {
-    north -= action.value
-    south += action.value
+    a -= action.value
+    b += action.value
   }
 
   return {
     ...manhattanDistData,
-    [ACTION_MAPPING.N]: north,
-    [ACTION_MAPPING.S]: south,
-  }
-}
-
-function moveEastWest(manhattanDistData, action) {
-  let east = manhattanDistData[ACTION_MAPPING.E]
-  let west = manhattanDistData[ACTION_MAPPING.W]
-
-  if (action.text === ACTION_MAPPING.E) {
-    east += action.value
-    west -= action.value
-  } else {
-    east -= action.value
-    west += action.value
-  }
-
-  return {
-    ...manhattanDistData,
-    [ACTION_MAPPING.E]: east,
-    [ACTION_MAPPING.W]: west,
+    [directionA]: a,
+    [directionB]: b,
   }
 }
 
