@@ -28,10 +28,10 @@ getInput(inputPath)
     console.log(`OG puzzle answer ⭐️`)
     console.log(solution)
 
-    // console.log('---')
-    // const solutionPartTwo = solvePartTwo(preppedInput)
-    // console.log(`Part two puzzle answer ⭐️⭐️`)
-    // console.log(solutionPartTwo)
+    console.log('---')
+    const solutionPartTwo = solvePartTwo(preppedInput)
+    console.log(`Part two puzzle answer ⭐️⭐️`)
+    console.log(solutionPartTwo)
 
     console.log('---')
     console.log('Merry Christmas! 🎄')
@@ -44,13 +44,21 @@ getInput(inputPath)
 |
 */
 function solvePuzzle(input) {
-  let timestamp = input.earliestDeparture - 1
+  const adjustedInput = {
+    ...input,
+    busIds: input.busIds
+      .map((busId) => parseInt(busId))
+      .filter((busId) => !isNaN(busId))
+      // Sort lowest to highest
+      .sort((a, b) => a - b),
+  }
+  let timestamp = adjustedInput.earliestDeparture - 1
   let busDeparted
   let minutesToWait
 
   while (typeof busDeparted === 'undefined') {
     timestamp++
-    let possibleDepartures = input.busIds.map((busId) => {
+    let possibleDepartures = adjustedInput.busIds.map((busId) => {
       // console.log('timestamp % busId', timestamp % busId)
       return timestamp % busId === 0
         ? { id: busId, departed: true }
@@ -64,8 +72,9 @@ function solvePuzzle(input) {
 
   console.table(busDeparted)
 
-  minutesToWait = timestamp - input.earliestDeparture
+  minutesToWait = timestamp - adjustedInput.earliestDeparture
 
+  // Solution: `3385`
   return minutesToWait * busDeparted.id
 }
 
@@ -87,12 +96,7 @@ function prepInput(input) {
   try {
     return {
       earliestDeparture: parseInt(input[0]),
-      busIds: input[1]
-        .split(',')
-        .map((busId) => parseInt(busId))
-        .filter((busId) => !isNaN(busId))
-        // Sort lowest to highest
-        .sort((a, b) => a - b),
+      busIds: input[1].split(','),
     }
   } catch (e) {
     console.error(e)
