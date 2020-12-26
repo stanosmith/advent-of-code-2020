@@ -7,7 +7,12 @@ const { getInput } = require('../helpers')
 // https://adventofcode.com/2020/day/13
 
 const inputPath = './input.txt'
-// const inputPath = './test-input.txt'
+// const inputPath = './test-input.txt' // 1068781
+// const inputPath = './test-input-1.txt' // 3417
+// const inputPath = './test-input-2.txt' // 754018
+// const inputPath = './test-input-3.txt' // 779210
+// const inputPath = './test-input-4.txt' // 1261476
+// const inputPath = './test-input-5.txt' // 1202161486
 
 getInput(inputPath)
   .then((res) => {
