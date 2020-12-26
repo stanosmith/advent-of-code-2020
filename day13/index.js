@@ -28,10 +28,10 @@ getInput(inputPath)
     // console.log('preppedInput.length', preppedInput.length)
     console.log(preppedInput)
 
-    console.log('---')
-    const solution = solvePuzzle(preppedInput)
-    console.log(`OG puzzle answer ⭐️`)
-    console.log(solution)
+    // console.log('---')
+    // const solution = solvePuzzle(preppedInput)
+    // console.log(`OG puzzle answer ⭐️`)
+    // console.log(solution)
 
     console.log('---')
     const solutionPartTwo = solvePartTwo(preppedInput)
@@ -89,7 +89,39 @@ function solvePuzzle(input) {
 |
 */
 function solvePartTwo(input) {
-  return 0
+  let timestamp = 100000000000000
+  let subsequentDepartures = []
+
+  while (subsequentDepartures.length < input.busIds.length) {
+    timestamp++
+    // console.log('timestamp', timestamp)
+
+    const buses = input.busIds.map((id, index) => {
+      return timestamp % id === 0
+        ? { id, timestamp, index, departed: true }
+        : { id, timestamp, index, departed: false }
+    })
+    const bus = buses[subsequentDepartures.length]
+
+    if (
+      bus &&
+      bus.index === subsequentDepartures.length &&
+      (bus.departed || bus.id === 'x')
+    ) {
+      // Add the departure to the array
+      subsequentDepartures = [...subsequentDepartures, bus]
+    } else {
+      subsequentDepartures = []
+    }
+
+    // if (subsequentDepartures.length >= 7) {
+    //   debugger
+    // }
+  }
+
+  // Test input answer: 1068781
+  // Solution: ``
+  return subsequentDepartures[0].timestamp
 }
 
 /*
