@@ -24,10 +24,10 @@ getInput(inputPath)
     // console.log(JSON.stringify(preppedInput, null, 2))
     console.log(preppedInput)
 
-    // console.log('---')
-    // const solution = solvePuzzle(preppedInput)
-    // console.log(`OG puzzle answer ⭐️`)
-    // console.log(solution)
+    console.log('---')
+    const solution = solvePuzzle(preppedInput)
+    console.log(`OG puzzle answer ⭐️`)
+    console.log(solution)
 
     // console.log('---')
     // const solutionPartTwo = solvePartTwo(preppedInput)
@@ -46,7 +46,12 @@ getInput(inputPath)
 */
 function solvePuzzle(input) {
   // Test input solution: 165
-  return 0
+  return input.map((program) => {
+    program.memoryOverrides.map((override) => {
+      console.log(override.value.toString(2))
+    })
+    return program
+  })
 }
 
 /*
