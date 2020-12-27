@@ -12,15 +12,16 @@ const inputPath = './test-input.txt'
 getInput(inputPath)
   .then((res) => {
     console.log('---')
-    const input = res.split('\n').filter((entry) => entry !== '')
+    const input = res.slice()
     console.log(`OG input:`)
     console.log('input.length', input.length)
-    console.log(input)
+    // console.log(input)
 
     console.log('---')
     const preppedInput = prepInput(input)
     console.log(`Prepped input:`)
     console.log('preppedInput.length', preppedInput.length)
+    // console.log(JSON.stringify(preppedInput, null, 2))
     console.log(preppedInput)
 
     // console.log('---')
@@ -65,6 +66,45 @@ function solvePartTwo(input) {
 function prepInput(input) {
   try {
     return input
+      .split('mask = ')
+      .filter((entry) => entry !== '')
+      .map((maskEntry) => {
+        return maskEntry
+          .split('\n')
+          .filter((entry) => entry !== '')
+          .map((entry) => {
+            const memoryString = 'mem['
+
+            // Memory
+            if (entry.indexOf(memoryString) !== -1) {
+              const memoryChanges = entry
+                .split(memoryString)
+                .join('')
+                .split('] = ')
+
+              return {
+                index: parseInt(memoryChanges[0]),
+                value: parseInt(memoryChanges[1]),
+              }
+            }
+
+            // Mask
+            return {
+              mask: entry,
+            }
+          })
+          .reduce((program, entry) => {
+            const { mask } = entry
+            const memoryOverrides = entry.index
+              ? [...program.memoryOverrides, entry]
+              : []
+            return {
+              mask,
+              ...program,
+              memoryOverrides,
+            }
+          }, {})
+      })
   } catch (e) {
     console.error(e)
     debugger
